@@ -66,8 +66,10 @@ const LeaderInput: React.FC<{
 interface OrganizationsPageProps {
     providers: ServiceProvider[];
     onCreate: (data: any) => void;
-    onApproveRequest: (orgId: number, userId: number) => void;
-    onRejectRequest: (orgId: number, userId: number) => void;
+    // FIX: Changed ID types from number to string to match ServiceProvider type.
+    onApproveRequest: (orgId: string, userId: string) => void;
+    // FIX: Changed ID types from number to string to match ServiceProvider type.
+    onRejectRequest: (orgId: string, userId: string) => void;
 }
 
 const OrganizationsPage: React.FC<OrganizationsPageProps> = ({ providers, onCreate, onApproveRequest, onRejectRequest }) => {

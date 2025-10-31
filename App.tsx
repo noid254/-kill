@@ -23,50 +23,118 @@ import MyContactsView from './components/MyContactsView';
 import SettingsView from './components/SettingsView';
 import AuthModal from './components/AuthModal';
 import GigsPage from './components/GigsPage';
+import AddServiceCardView from './components/AddServiceCardView';
+import MessageCenterView from './components/MessageCenterView';
+import AssetRegistryView from './components/AssetRegistryView';
+import RegisterAssetView from './components/RegisterAssetView';
+import OwnershipCheckView from './components/OwnershipCheckView';
+import DocumentDetailView from './components/DocumentDetailView';
 
 
 // --- SVG Icons ---
 const MenuIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>;
-const BellIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>;
+const BellIcon: React.FC<{ hasNotification: boolean }> = ({ hasNotification }) => (
+    <div className="relative">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+        {hasNotification && <div className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full border border-brand-navy"></div>}
+    </div>
+);
 const CheckCircleIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 inline-block ml-2 text-green-300" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>;
-const SkylineIcon = () => <svg width="311" height="57" viewBox="0 0 311 57" fill="none" xmlns="http://www.w3.org/2000/svg" className="absolute bottom-0 left-0 w-full h-auto"><path d="M311 57V45.5L305.5 40L300 45.5V57H311Z" fill="white" fillOpacity="0.1"/><path d="M291 57V42L285 35L279 42V57H291Z" fill="white" fillOpacity="0.1"/><path d="M273 57V48.5L268.5 44L264 48.5V57H273Z" fill="white" fillOpacity="0.1"/><path d="M251 57V35L247 31L243 35V57H251Z" fill="white" fillOpacity="0.1"/><path d="M239 57V26L233 18L227 26V57H239Z" fill="white" fillOpacity="0.1"/><path d="M221 57V48.5L216.5 44L212 48.5V57H221Z" fill="white" fillOpacity="0.1"/><path d="M208 57V45.5L202.5 40L197 45.5V57H208Z" fill="white" fillOpacity="0.1"/><path d="M188 57V42L182 35L176 42V57H188Z" fill="white" fillOpacity="0.1"/><path d="M171 57V22L165 14L159 22V57H171Z" fill="white" fillOpacity="0.1"/><path d="M153 57V48.5L148.5 44L144 48.5V57H153Z" fill="white" fillOpacity="0.1"/><path d="M132 57V45.5L126.5 40L121 45.5V57H132Z" fill="white" fillOpacity="0.1"/><path d="M112 57V42L106 35L100 42V57H112Z" fill="white" fillOpacity="0.1"/><path d="M94 57V48.5L89.5 44L85 48.5V57H94Z" fill="white" fillOpacity="0.1"/><path d="M72 57V35L68 31L64 35V57H72Z" fill="white" fillOpacity="0.1"/><path d="M60 57V26L54 18L48 26V57H60Z" fill="white" fillOpacity="0.1"/><path d="M42 57V48.5L37.5 44L33 48.5V57H42Z" fill="white" fillOpacity="0.1"/><path d="M29 57V45.5L23.5 40L18 45.5V57H29Z" fill="white" fillOpacity="0.1"/><path d="M9 57V42L3 35L-3 42V57H9Z" fill="white" fillOpacity="0.1"/></svg>;
-const GatePassIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 text-icon-orange" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-1.026.977-2.27.977-3.632V8.528c0-2.28-1.47-4.243-3.588-4.832A12.015 12.015 0 0012 3.5c-2.433 0-4.66.736-6.412 2.001A9.44 9.44 0 002.5 8.528v4.84c0 1.362.332 2.606.977 3.632M15 15h.01M4.988 15h.01M12 15h.01" /></svg>;
-const InvoicesIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 text-green-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>;
-const MyPlacesIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 text-icon-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>;
-const NikosokoIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 text-icon-lime" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>;
-const TukosokoIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 2L3 6v14c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2V6l-3-4H6zM3.8 6h16.4M16 10a4 4 0 1 1-8 0"/></svg>;
-const MentorHubIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 text-icon-purple" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>;
+const GatePassIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 text-gray-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-1.026.977-2.27.977-3.632V8.528c0-2.28-1.47-4.243-3.588-4.832A12.015 12.015 0 0012 3.5c-2.433 0-4.66.736-6.412 2.001A9.44 9.44 0 002.5 8.528v4.84c0 1.362.332 2.606.977 3.632M15 15h.01M4.988 15h.01M12 15h.01" /></svg>;
+const InvoicesIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 text-gray-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>;
+const MyPlacesIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 text-gray-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>;
+const NikosokoIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 text-gray-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>;
+const TukosokoIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 text-gray-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 2L3 6v14c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2V6l-3-4H6zM3.8 6h16.4M16 10a4 4 0 1 1-8 0"/></svg>;
+const MentorHubIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 text-gray-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>;
+
+
 
 // --- Home page sub-components ---
 
-const Header: React.FC<{ onMenuClick: () => void; user: ServiceProvider | null; onLoginClick: () => void; }> = ({ onMenuClick, user, onLoginClick }) => (
-    <header className="bg-brand-green text-white rounded-b-3xl p-4 pt-5 relative overflow-hidden shadow-lg">
+const banners = [
+  {
+    id: 1,
+    content: (
+      <>
+        <h2 className="text-4xl font-extrabold leading-tight text-brand-gold">
+          KARIBU SOKO
+        </h2>
+        <p className="mt-2 opacity-90 text-md text-gray-200">Skill, your borderless currency</p>
+      </>
+    ),
+  },
+  {
+    id: 2,
+    content: (
+      <div className="flex flex-col items-center text-white">
+        <p className="text-xl opacity-90 -mb-2">Bila</p>
+        <h2 className="text-7xl font-extrabold leading-none tracking-tighter text-brand-gold">$KILL</h2>
+        <p className="text-lg opacity-90">itakuwa ngumu</p>
+      </div>
+    ),
+  },
+  {
+    id: 3,
+    content: (
+       <>
+        <h2 className="text-3xl font-extrabold leading-tight text-brand-gold">
+          Build Your A-Team
+        </h2>
+        <p className="mt-2 opacity-90 text-md text-gray-200">Save your favorite artisans & build your go-to contact list.</p>
+      </>
+    )
+  }
+];
+
+const Header: React.FC<{
+    onMenuClick: () => void;
+    user: ServiceProvider | null;
+    isAuthenticated: boolean;
+    onLoginClick: () => void;
+    onMessagesClick: () => void;
+    hasNewMessages: boolean;
+}> = ({ onMenuClick, user, isAuthenticated, onLoginClick, onMessagesClick, hasNewMessages }) => {
+  const [currentBanner, setCurrentBanner] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentBanner(prev => (prev + 1) % banners.length);
+    }, 5000); // Change banner every 5 seconds
+
+    return () => clearInterval(timer);
+  }, []);
+  
+  return (
+    <header className="bg-brand-navy text-white p-4 pt-5 relative overflow-hidden shadow-lg h-[240px] flex flex-col">
       {/* Top Nav */}
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex justify-between items-center mb-4 flex-shrink-0">
         <button onClick={onMenuClick} className="text-white p-2 -ml-2"><MenuIcon /></button>
         <div className="flex items-center space-x-2">
-          <button className="text-white p-2"><BellIcon /></button>
-          {user ? (
-             <img src={user.avatarUrl} alt={user.name} className="w-9 h-9 rounded-full border-2 border-white/50" />
-          ) : (
-             <button onClick={onLoginClick} className="text-sm font-semibold bg-white/20 px-3 py-1 rounded-full">Sign In</button>
-          )}
+          <button onClick={onMessagesClick} className="text-white p-2"><BellIcon hasNotification={hasNewMessages} /></button>
         </div>
       </div>
       
-      {/* Banner Content */}
-      <div className="relative z-10 px-2 pb-6">
-        <h2 className="text-4xl font-bold leading-tight">
-          KARIBU SOKO
-          <CheckCircleIcon />
-        </h2>
-        <p className="mt-2 opacity-90 text-md">Skill, your borderless currency</p>
+      {/* Banner Content Wrapper */}
+      <div className="relative z-10 px-2 flex-grow flex flex-col justify-center text-center">
+        <div key={banners[currentBanner].id} className="animate-fade-in">
+            {banners[currentBanner].content}
+        </div>
       </div>
-  
-      {/* Decorative element */}
-      <SkylineIcon />
+
+      {/* Banner Indicators */}
+      <div className="flex justify-center items-center gap-2 pt-4 pb-2 z-10">
+        {banners.map((_, index) => (
+          <button 
+            key={index} 
+            onClick={() => setCurrentBanner(index)}
+            className={`w-2 h-2 rounded-full transition-all duration-300 ${currentBanner === index ? 'bg-brand-gold scale-125' : 'bg-white/50'}`}
+            aria-label={`Go to banner ${index + 1}`}
+          />
+        ))}
+      </div>
     </header>
   );
+};
 
 const OpportunityCard: React.FC<{
     location: string;
@@ -92,7 +160,7 @@ const OpportunityCard: React.FC<{
 
 // --- Main App Component ---
 
-export type CurrentPage = 'home' | 'nikosoko' | 'tukosoko' | 'myplaces' | 'gatepass' | 'hub' | 'mentorhub' | 'mycatalogue' | 'mytickets' | 'mycontacts' | 'settings' | 'admin' | 'gigs';
+export type CurrentPage = 'home' | 'nikosoko' | 'tukosoko' | 'myplaces' | 'gatepass' | 'hub' | 'mentorhub' | 'mycatalogue' | 'mytickets' | 'mycontacts' | 'settings' | 'admin' | 'gigs' | 'signup' | 'messageCenter' | 'assetRegistry' | 'registerAsset' | 'ownershipCheck';
 type HubView = 'hub_home' | 'myDocuments' | 'quoteGenerator' | 'invoice' | 'brandKit' | 'receiptGenerator' | 'scanDocument';
 
 const App: React.FC = () => {
@@ -109,52 +177,136 @@ const App: React.FC = () => {
     const [invitations, setInvitations] = useState<Invitation[]>([]);
     const [tickets, setTickets] = useState<Ticket[]>([]);
     const [gigs, setGigs] = useState<Gig[]>([]);
-    const [savedContacts, setSavedContacts] = useState<number[]>([]);
+    const [savedContacts, setSavedContacts] = useState<string[]>([]);
+    const [categories, setCategories] = useState<string[]>([]);
     
     // User state
     const [currentUser, setCurrentUser] = useState<ServiceProvider | null>(null);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [isSuperAdmin, setIsSuperAdmin] = useState(false);
     const [assets, setAssets] = useState<BusinessAssetsType>({ name: 'Your Company Name', address: 'Your Address', logo: null });
+    const [pendingPhone, setPendingPhone] = useState<string | null>(null);
 
     // UI state
     const [selectedProvider, setSelectedProvider] = useState<ServiceProvider | null>(null);
+    const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
+    const [hasNewMessages, setHasNewMessages] = useState(true);
 
     // --- Effects ---
+    const fetchData = async () => {
+        try {
+            const [
+                providersData,
+                catalogueData,
+                documentsData,
+                invitationsData,
+                ticketsData,
+                gigsData,
+                categoriesData
+            ] = await Promise.all([
+                api.getProviders(),
+                api.getCatalogueItems(),
+                api.getDocuments(),
+                api.getInvitations(),
+                api.getTickets(),
+                api.getGigs(),
+                api.getCategories()
+            ]);
+            setProviders(providersData);
+            setCatalogueItems(catalogueData);
+            setDocuments(documentsData);
+            setInvitations(invitationsData);
+            setTickets(ticketsData);
+            setGigs(gigsData);
+            setCategories(categoriesData);
+        } catch (error) {
+            console.error("Failed to fetch initial data:", error);
+        }
+    };
+    
     useEffect(() => {
-        // Fetch all data on initial load
-        api.getProviders().then(setProviders);
-        api.getCatalogueItems().then(setCatalogueItems);
-        api.getDocuments().then(setDocuments);
-        api.getInvitations().then(setInvitations);
-        api.getTickets().then(setTickets);
-        api.getGigs().then(setGigs);
-        
-        // Mock saved contacts for demo
-        setSavedContacts([2, 5, 8]);
+        const checkAuthStatus = async () => {
+            const token = api.getToken();
+            if (token) {
+                try {
+                    const userProfile = await api.getMyProfile();
+                    setCurrentUser(userProfile);
+                    setIsAuthenticated(true);
+                    // Assuming isSuperAdmin is part of the userProfile object from the backend
+                    // setIsSuperAdmin(userProfile.isSuperAdmin); 
+                } catch (error) {
+                    console.error("Session invalid. Logging out.", error);
+                    api.clearToken();
+                }
+            }
+        };
+
+        checkAuthStatus();
+        fetchData();
     }, []);
     
     // --- Handlers ---
 
-    const handleLogin = (response: api.VerifyOtpResponse) => {
-        if (response.success && response.user) {
-            setCurrentUser(response.user);
-            setIsAuthenticated(true);
-            setIsSuperAdmin(response.isSuperAdmin);
-            if (response.user.name) {
+    const handleLogin = (response: api.VerifyOtpResponse, phone: string) => {
+        if (response.success && response.token) {
+            api.setToken(response.token);
+            if (response.user) {
+                setCurrentUser(response.user);
+                setIsAuthenticated(true);
+                setIsSuperAdmin(response.isSuperAdmin);
                 setAssets({ name: response.user.name, address: response.user.location, logo: response.user.avatarUrl });
+                setIsAuthModalOpen(false);
+                setPendingPhone(null);
+            } else {
+                setIsAuthModalOpen(false);
+                setIsAuthenticated(true);
+                setIsSuperAdmin(response.isSuperAdmin);
+                setPendingPhone(phone);
+                setCurrentPage('signup');
             }
-            setIsAuthModalOpen(false);
-        } else if (response.success && !response.user) {
-            alert("Login successful, but you don't have a profile yet. Profile creation is required to proceed.");
-            // In a real app, you would redirect to a signup/profile creation page.
-            // For now, we close the modal.
-            setIsAuthModalOpen(false);
         }
-        // If !response.success, the modal will show an error and stay open.
     };
     
+    const handleCreateProfile = async (
+        profileData: Omit<ServiceProvider, 'id' | 'name' | 'phone' | 'avatarUrl' | 'whatsapp' | 'flagCount' | 'views' | 'coverImageUrl' | 'isVerified' | 'cta'>,
+        name: string,
+        avatar: string | null,
+        referralCode: string,
+        cta: ServiceProvider['cta'],
+    ) => {
+        if (!pendingPhone) {
+            alert("An error occurred: Your phone number is missing. Please sign in again.");
+            setCurrentPage('home');
+            setIsAuthenticated(false);
+            return;
+        }
+
+        const newProviderData: Omit<ServiceProvider, 'id'> = {
+            ...profileData,
+            name,
+            phone: pendingPhone,
+            whatsapp: pendingPhone,
+            avatarUrl: avatar || `https://i.pravatar.cc/150?u=${pendingPhone}`,
+            coverImageUrl: `https://picsum.photos/seed/${name.replace(/\s+/g, '-')}-cover/600/400`,
+            isVerified: false,
+            flagCount: 0,
+            views: 0,
+            cta,
+        };
+
+        try {
+            const newUser = await api.createProvider(newProviderData);
+            setCurrentUser(newUser);
+            setPendingPhone(null);
+            setCurrentPage('home');
+            fetchData(); // Refetch all data
+        } catch (error) {
+            console.error("Failed to create profile:", error);
+            alert("There was an error creating your profile. Please try again.");
+        }
+    };
+
     const handleOpenAuthModal = () => setIsAuthModalOpen(true);
     
     const handleSelectProvider = (provider: ServiceProvider) => {
@@ -164,6 +316,8 @@ const App: React.FC = () => {
     const handleBack = () => {
         if (selectedProvider) {
             setSelectedProvider(null);
+        } else if (selectedDocument) {
+            setSelectedDocument(null);
         } else if (currentPage === 'hub') {
             if (currentHubView !== 'hub_home') {
                 setCurrentHubView('hub_home');
@@ -177,10 +331,16 @@ const App: React.FC = () => {
 
     const handleNavigate = (page: CurrentPage | 'profile') => {
         setIsMenuOpen(false);
-        const protectedPages: (CurrentPage | 'profile')[] = ['profile', 'mycontacts', 'mytickets', 'mycatalogue', 'settings', 'admin'];
+        const protectedPages: (CurrentPage | 'profile')[] = ['profile', 'mycontacts', 'mytickets', 'mycatalogue', 'settings', 'admin', 'hub', 'gatepass', 'messageCenter', 'assetRegistry', 'registerAsset'];
         
         if (protectedPages.includes(page) && !isAuthenticated) {
             handleOpenAuthModal();
+            return;
+        }
+
+        const requiresProfile: (CurrentPage | 'profile')[] = ['profile', 'mycatalogue', 'mytickets', 'hub', 'gatepass', 'assetRegistry', 'registerAsset'];
+        if (requiresProfile.includes(page) && !currentUser) {
+            setCurrentPage('signup');
             return;
         }
 
@@ -188,22 +348,24 @@ const App: React.FC = () => {
             setSelectedProvider(currentUser);
         } else {
             setSelectedProvider(null);
+            setSelectedDocument(null);
             setCurrentPage(page as CurrentPage);
         }
     };
 
     const handleLogout = () => {
+        api.clearToken();
         setCurrentUser(null);
         setIsAuthenticated(false);
         setIsSuperAdmin(false);
         setIsMenuOpen(false);
-        setCurrentPage('home'); // Go to home on logout
+        setCurrentPage('home');
     };
     
     // --- Data for Home Page ---
     const toolsData = [
       { name: 'Gate Pass', icon: <GatePassIcon />, page: 'gatepass' },
-      { name: 'Invoices', icon: <InvoicesIcon />, notification: documents.length, page: 'hub' },
+      { name: 'My Workshop', icon: <InvoicesIcon />, notification: documents.length, page: 'hub' },
       { name: 'My Places', icon: <MyPlacesIcon />, page: 'myplaces' },
       { name: 'Nikosoko', icon: <NikosokoIcon />, page: 'nikosoko' },
       { name: 'Tukosoko', icon: <TukosokoIcon />, page: 'tukosoko' },
@@ -217,10 +379,13 @@ const App: React.FC = () => {
     ];
     
     const handleToolClick = (page: CurrentPage) => {
-        const protectedPages: CurrentPage[] = ['hub', 'gatepass'];
+        const protectedPages: CurrentPage[] = ['hub', 'gatepass', 'assetRegistry', 'myplaces'];
         if (protectedPages.includes(page) && !isAuthenticated) {
             handleOpenAuthModal();
-        } else {
+        } else if (protectedPages.includes(page) && !currentUser) {
+            setCurrentPage('signup');
+        }
+        else {
             setCurrentPage(page);
         }
     };
@@ -237,8 +402,8 @@ const App: React.FC = () => {
     const ToolButton: React.FC<{ name: string; icon: React.ReactNode; notification?: number; onClick: () => void }> = ({ name, icon, notification, onClick }) => (
       <button onClick={onClick} className="bg-white rounded-2xl shadow-sm p-4 flex flex-col items-center justify-center space-y-2.5 hover:shadow-md hover:-translate-y-1 transition-all relative active-scale">
         {notification ? (
-          <div className="absolute top-2 right-2 bg-icon-lime text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
-            {notification} New
+          <div className="absolute top-2 right-2 bg-brand-gold text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+            {notification}
           </div>
         ) : null}
         {icon}
@@ -257,11 +422,16 @@ const App: React.FC = () => {
             currentUserPhone={currentUser?.phone}
             onBack={() => setSelectedProvider(null)}
             onLogout={handleLogout}
-            onUpdate={(updated) => {
-                setSelectedProvider(updated);
-                setProviders(providers.map(p => p.id === updated.id ? updated : p));
+            onUpdate={async (updated) => {
+                const updatedUser = await api.updateProvider(updated);
+                setSelectedProvider(updatedUser);
+                setProviders(providers.map(p => p.id === updatedUser.id ? updatedUser : p));
             }}
-            onDelete={(id) => { setProviders(p => p.filter(pr => pr.id !== id)); setSelectedProvider(null); }}
+            onDelete={async (id) => { 
+                await api.deleteProvider(id);
+                setProviders(p => p.filter(pr => pr.id !== id)); 
+                setSelectedProvider(null); 
+            }}
             onContactClick={handleOpenAuthModal}
             onInitiateContact={() => true}
             savedContacts={savedContacts}
@@ -272,6 +442,19 @@ const App: React.FC = () => {
             isFlaggedByUser={false}
             onFlag={() => {}}
         />;
+    }
+    
+    if (selectedDocument) {
+        return <DocumentDetailView 
+            document={selectedDocument}
+            onBack={() => setSelectedDocument(null)}
+            onUpdate={async (doc) => {
+                const updatedDoc = await api.updateDocument(doc);
+                setDocuments(docs => docs.map(d => d.id === updatedDoc.id ? updatedDoc : d));
+                setSelectedDocument(updatedDoc);
+            }}
+            currentUser={currentUser!}
+        />
     }
     
     const renderContent = () => {
@@ -307,18 +490,47 @@ const App: React.FC = () => {
                     isSuperAdmin={isSuperAdmin}
                     isAuthenticated={isAuthenticated}
                     invitations={invitations}
-                    onCreateInvitation={async () => { /* mock */ }}
-                    onCreateKnock={async () => { /* mock */ }}
-                    onUpdateInvitationStatus={async () => { /* mock */ }}
+                    // FIX: Add missing hostName property to the data object before calling api.createInvitation to resolve type mismatch.
+                    onCreateInvitation={async (data) => { 
+                        if (!currentUser?.name) return;
+                        await api.createInvitation({ ...data, hostName: currentUser.name }, 'Invite'); 
+                        fetchData(); 
+                    }}
+                    // FIX: The `data` object for `onCreateKnock` needs the `hostName`, which is added from the `currentUser`.
+                    onCreateKnock={async (data) => { 
+                        if (!currentUser?.name) return;
+                        await api.createInvitation({ ...data, hostName: currentUser.name }, 'Knock'); 
+                        fetchData(); 
+                    }}
+                    onUpdateInvitationStatus={async (id, status) => { await api.updateInvitation(id, status); fetchData(); }}
                     onAuthClick={handleOpenAuthModal}
-                    onGoToSignup={() => {}}
+                    onGoToSignup={() => setCurrentPage('signup')}
+                /></PageWrapper>;
+            case 'assetRegistry':
+                return <PageWrapper title="Asset Registry"><AssetRegistryView 
+                    documents={documents} 
+                    currentUser={currentUser}
+                    onNavigate={(page) => setCurrentPage(page)}
+                    onSelectDocument={setSelectedDocument}
+                /></PageWrapper>;
+            case 'registerAsset':
+                return <PageWrapper title="Register New Asset"><RegisterAssetView 
+                    onBack={() => setCurrentPage('assetRegistry')}
+                    onSave={async (doc) => {
+                        await api.addDocument(doc);
+                        fetchData();
+                        setCurrentPage('assetRegistry');
+                    }}
+                /></PageWrapper>;
+             case 'ownershipCheck':
+                return <PageWrapper title="Ownership Check"><OwnershipCheckView 
+                    allDocuments={documents} 
                 /></PageWrapper>;
             case 'hub':
-                const handleSaveDoc = (doc: Omit<Document, 'id'>) => {
-                    api.addDocument(doc).then(newDoc => {
-                        setDocuments(prev => [newDoc, ...prev]);
-                        setCurrentHubView('myDocuments');
-                    });
+                const handleSaveDoc = async (doc: Omit<Document, 'id'>) => {
+                    await api.addDocument(doc);
+                    fetchData();
+                    setCurrentHubView('myDocuments');
                 }
                 switch (currentHubView) {
                     case 'hub_home':
@@ -332,7 +544,7 @@ const App: React.FC = () => {
                     case 'brandKit':
                         return <PageWrapper title="Brand Kit"><BusinessAssets assets={assets} currentUser={currentUser} onSave={setAssets} onOrder={() => {}} onAddToCatalogue={() => {}} /></PageWrapper>;
                     case 'myDocuments':
-                        return <PageWrapper title="My Documents"><MyDocumentsView documents={documents} allDocuments={documents} onScan={() => setCurrentHubView('scanDocument')} onSelectDocument={() => {}} currentUser={currentUser} /></PageWrapper>;
+                        return <PageWrapper title="My Documents"><MyDocumentsView documents={documents} onScan={() => setCurrentHubView('scanDocument')} onSelectDocument={setSelectedDocument} currentUser={currentUser} /></PageWrapper>;
                     case 'scanDocument':
                         return <PageWrapper title="Scan Asset"><ScanDocumentView onBack={() => setCurrentHubView('myDocuments')} onSave={handleSaveDoc} /></PageWrapper>;
                     default:
@@ -345,9 +557,9 @@ const App: React.FC = () => {
             case 'mycatalogue':
                  return <CatalogueView 
                     items={catalogueItems.filter(i => i.providerId === currentUser?.id)} 
-                    onUpdateItems={(items) => setCatalogueItems(current => [...items, ...current.filter(i => i.providerId !== currentUser?.id)])} 
+                    onUpdateItems={async (items) => { /*This should be an API call per item*/ fetchData(); }} 
                     currentUser={currentUser as ServiceProvider} 
-                    onUpdateUser={(user) => setCurrentUser(user)}
+                    onUpdateUser={async (user) => {const updated = await api.updateProvider(user); setCurrentUser(updated); }}
                     isAuthenticated={isAuthenticated}
                     onAuthClick={handleOpenAuthModal}
                     onInitiateContact={() => true}
@@ -360,7 +572,6 @@ const App: React.FC = () => {
                     onSelectProvider={handleSelectProvider}
                     onApply={(gig) => {
                         alert(`Applied for gig: ${gig.title}`);
-                        // In a real app, this would send an application message to the provider's inbox
                     }}
                     isAuthenticated={isAuthenticated}
                     onAuthClick={handleOpenAuthModal}
@@ -370,6 +581,8 @@ const App: React.FC = () => {
                 return <MyContactsView contacts={contactProviders} onSelectContact={handleSelectProvider} onBack={handleBack} />;
             case 'settings':
                 return <SettingsView onBack={handleBack} />;
+            case 'messageCenter':
+                return <MessageCenterView onBack={handleBack} />;
             case 'admin':
                 return isSuperAdmin ? <SuperAdminDashboard 
                     onBack={handleBack}
@@ -388,14 +601,35 @@ const App: React.FC = () => {
                     onApproveRequest={() => {}}
                     onRejectRequest={() => {}}
                 /> : <PageWrapper title="Access Denied"><div className="p-4 text-center">You do not have permission to view this page.</div></PageWrapper>;
+            case 'signup':
+                return <AddServiceCardView
+                    onBack={() => setCurrentPage('home')}
+                    onSave={handleCreateProfile}
+                    categories={categories}
+                    currentUser={{ phone: pendingPhone }}
+                />;
             case 'home':
             default:
                 return (
                     <>
-                    <Header onMenuClick={() => setIsMenuOpen(true)} user={currentUser} onLoginClick={handleOpenAuthModal} />
+                    <Header 
+                        onMenuClick={() => setIsMenuOpen(true)} 
+                        user={currentUser} 
+                        isAuthenticated={isAuthenticated} 
+                        onLoginClick={handleOpenAuthModal}
+                        onMessagesClick={() => {
+                            if (!isAuthenticated) {
+                                handleOpenAuthModal();
+                            } else {
+                                setHasNewMessages(false);
+                                setCurrentPage('messageCenter');
+                            }
+                        }}
+                        hasNewMessages={hasNewMessages}
+                    />
                     <main className="space-y-6 py-6">
                         <section className="px-4 animate-slide-in-up" style={{ animationDelay: '100ms' }}>
-                        <h3 className="text-lg font-bold text-brand-dark mb-4">My Essential Tools</h3>
+                        <h3 className="text-lg font-bold text-brand-navy mb-4">My Essential Tools</h3>
                         <div className="grid grid-cols-3 gap-3">
                             {toolsData.map(tool => (
                             <ToolButton key={tool.name} name={tool.name} icon={tool.icon} notification={tool.notification} onClick={() => handleToolClick(tool.page as CurrentPage)} />
@@ -405,7 +639,7 @@ const App: React.FC = () => {
 
                         <section className="animate-slide-in-up" style={{ animationDelay: '250ms' }}>
                         <div className="px-4 mb-4">
-                            <h3 className="text-lg font-bold text-brand-dark">Nearby Opportunities</h3>
+                            <h3 className="text-lg font-bold text-brand-navy">Nearby Opportunities</h3>
                             <p className="text-sm text-gray-500">Nairobi Area</p>
                         </div>
                         <div className="flex space-x-4 overflow-x-auto no-scrollbar pl-4 pb-2">

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import type { CatalogueItem, ServiceProvider } from '../types';
 
 interface CatalogueItemDetailModalProps {
@@ -12,21 +12,9 @@ interface CatalogueItemDetailModalProps {
 
 const CallIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>;
 const WhatsAppIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.894 11.892-1.99 0-3.903-.52-5.586-1.456l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 4.315 1.731 6.086l.474 1.039-1.04 3.833 3.855-1.017z" /></svg>;
+const ClockIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>;
 
 const CatalogueItemDetailModal: React.FC<CatalogueItemDetailModalProps> = ({ item, onClose, provider, isAuthenticated, onAuthClick, onInitiateContact }) => {
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const hasMultipleImages = item.imageUrls && item.imageUrls.length > 1;
-
-  const nextImage = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setCurrentImageIndex((prevIndex) => (prevIndex + 1) % item.imageUrls.length);
-  };
-
-  const prevImage = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setCurrentImageIndex((prevIndex) => (prevIndex - 1 + item.imageUrls.length) % item.imageUrls.length);
-  };
-
   const handleCall = () => {
     if (!provider) return;
     if (!isAuthenticated) {
@@ -50,48 +38,61 @@ const CatalogueItemDetailModal: React.FC<CatalogueItemDetailModalProps> = ({ ite
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-end z-50" onClick={onClose}>
+    <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-end z-50 animate-fade-in" onClick={onClose}>
       <div 
-        className="bg-white rounded-t-2xl shadow-xl w-full max-w-sm h-[80vh] flex flex-col" 
+        className="bg-gray-50 rounded-t-3xl shadow-2xl w-full max-w-sm h-[95vh] flex flex-col animate-slide-in-up" 
         onClick={e => e.stopPropagation()}
       >
-        <div className="flex-shrink-0 relative">
-          <img 
-            src={item.imageUrls[currentImageIndex] || 'https://picsum.photos/seed/placeholder/800/600'} 
-            alt={`${item.title} ${currentImageIndex + 1}`} 
-            className="w-full h-48 object-cover rounded-t-2xl" 
-          />
-           {hasMultipleImages && (
-              <>
-                  <button onClick={prevImage} className="absolute left-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-40 text-white rounded-full p-1 z-10 hover:bg-opacity-60 transition">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
-                  </button>
-                  <button onClick={nextImage} className="absolute right-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-40 text-white rounded-full p-1 z-10 hover:bg-opacity-60 transition">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
-                  </button>
-                  <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex space-x-2">
-                      {item.imageUrls.map((_, index) => (
-                          <div key={index} className={`w-2 h-2 rounded-full ${index === currentImageIndex ? 'bg-white' : 'bg-white/50'}`}></div>
-                      ))}
-                  </div>
-              </>
-          )}
-          <button onClick={onClose} className="absolute top-3 right-3 bg-black bg-opacity-50 text-white rounded-full w-6 h-6 flex items-center justify-center text-lg z-10">&times;</button>
+        <div className="p-4 flex-shrink-0 text-center relative cursor-grab" onTouchStart={onClose}>
+            <div className="w-10 h-1.5 bg-gray-300 rounded-full mx-auto"></div>
         </div>
-        <div className="p-4 flex-1 overflow-y-auto">
-          <p className="text-sm font-bold text-brand-primary uppercase">{item.category}</p>
-          <h2 className="text-2xl font-bold text-gray-900 mt-1">{item.title}</h2>
-          <p className="text-2xl font-bold text-brand-dark mt-3">{item.price}</p>
-          <p className="text-sm text-gray-700 mt-4 leading-relaxed">{item.description}</p>
+
+        <div className="flex-1 overflow-y-auto no-scrollbar pb-28">
+            <div className="snap-x snap-mandatory flex overflow-x-auto no-scrollbar">
+                {item.imageUrls.map((url, index) => (
+                    <div key={index} className="flex-shrink-0 w-full h-72 snap-center">
+                        <img 
+                            src={url || 'https://picsum.photos/seed/placeholder/800/600'} 
+                            alt={`${item.title} image ${index + 1}`} 
+                            className="w-full h-full object-cover" 
+                        />
+                    </div>
+                ))}
+            </div>
+
+            <div className="p-5 space-y-4">
+              <p className="text-sm font-bold text-brand-gold uppercase tracking-wider">{item.category}</p>
+              <h1 className="text-3xl font-bold text-gray-900 leading-tight">{item.title}</h1>
+              <p className="text-3xl font-bold text-brand-navy">{item.price}</p>
+              
+              {item.duration && (
+                <div className="flex items-center gap-2 text-gray-600">
+                    <ClockIcon />
+                    <p className="text-sm font-semibold">{item.duration}</p>
+                </div>
+              )}
+              
+              {item.discountInfo && (
+                <div className="mt-4 p-3 bg-green-100 border border-green-200 rounded-lg text-center">
+                  <p className="font-bold text-green-800">{item.discountInfo}</p>
+                </div>
+              )}
+
+              <div className="pt-4 border-t border-gray-200">
+                  <h2 className="text-md font-semibold text-gray-800 mb-2">Description</h2>
+                  <p className="text-sm text-gray-700 leading-relaxed">{item.description}</p>
+              </div>
+            </div>
         </div>
-        <div className="p-4 bg-gray-50 border-t flex-shrink-0 flex items-center gap-3">
+
+        <div className="absolute bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200 shadow-[0_-2px_10px_rgba(0,0,0,0.05)] flex items-center gap-3">
           {provider?.phone && (
-              <button onClick={handleCall} className="flex-1 bg-gray-200 text-gray-800 font-bold py-3 px-4 rounded-lg hover:bg-gray-300 transition-colors flex items-center justify-center gap-2">
+              <button onClick={handleCall} className="flex-1 bg-gray-200 text-gray-800 font-bold py-4 px-4 rounded-xl hover:bg-gray-300 transition-colors flex items-center justify-center gap-2 active-scale">
                   <CallIcon /> Call
               </button>
           )}
           {provider?.whatsapp && (
-              <button onClick={handleWhatsApp} className="flex-1 bg-green-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-600 transition-colors flex items-center justify-center gap-2">
+              <button onClick={handleWhatsApp} className="flex-1 bg-brand-navy text-white font-bold py-4 px-4 rounded-xl hover:opacity-90 transition-colors flex items-center justify-center gap-2 active-scale">
                   <WhatsAppIcon /> WhatsApp
               </button>
           )}

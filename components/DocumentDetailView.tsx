@@ -13,6 +13,8 @@ const formatKsh = (amount: number) => `Ksh ${amount.toLocaleString('en-US', { mi
 const DocumentDetailView: React.FC<{ document: Document; onBack: () => void; onUpdate: (doc: Document) => void; currentUser: ServiceProvider; }> = ({ document, onBack, onUpdate, currentUser }) => {
     const [mainImageIndex, setMainImageIndex] = useState(0);
     const [isReceiptModalOpen, setIsReceiptModalOpen] = useState(false);
+    const [isLogbookModalOpen, setIsLogbookModalOpen] = useState(false);
+    
     const assetImages = document.productImages?.length ? document.productImages : (document.scannedImageUrl ? [document.scannedImageUrl] : []);
     
     const handleRequestVerification = () => {
@@ -52,7 +54,8 @@ const DocumentDetailView: React.FC<{ document: Document; onBack: () => void; onU
         }
 
         if (newOwnerPhone && newOwnerPhone.length > 8) {
-             const updatedDoc = await api.initiateAssetTransfer(document.id, newOwnerPhone, currentUser);
+             // FIX: Removed extra `currentUser` argument from `initiateAssetTransfer` call.
+             const updatedDoc = await api.initiateAssetTransfer(document.id, newOwnerPhone);
              onUpdate(updatedDoc);
              alert(`Transfer request sent to ${newOwnerPhone}. They will receive a notification in their Niko Soko inbox to accept or deny the transfer.`);
         } else if (newOwnerPhone) {
@@ -78,8 +81,17 @@ const DocumentDetailView: React.FC<{ document: Document; onBack: () => void; onU
 
             <div className="p-4 space-y-4">
                 <div className="bg-white rounded-xl shadow-sm p-4">
-                    <h1 className="text-2xl font-bold text-gray-900">{document.items?.[0]?.description || 'Asset Details'}</h1>
-                    {document.items?.[0]?.serial && <p className="text-gray-500 font-mono mt-1">SN: {document.items[0].serial}</p>}
+                    <h1 className="text-2xl font-bold text-gray-900">{document.items?.[0]?.description || document.model || 'Asset Details'}</h1>
+                    
+                    {document.assetType === 'Vehicle' ? (
+                         <div className="font-mono text-gray-500 mt-1 grid grid-cols-2 gap-x-4">
+                            <span>{document.registrationNumber}</span>
+                            <span>YOM: {document.yearOfManufacture}</span>
+                         </div>
+                    ) : (
+                        document.items?.[0]?.serial && <p className="text-gray-500 font-mono mt-1">SN: {document.items[0].serial}</p>
+                    )}
+
                     {document.specifications && <p className="text-sm text-gray-600 mt-2 whitespace-pre-wrap">{document.specifications}</p>}
                 </div>
 
@@ -104,6 +116,13 @@ const DocumentDetailView: React.FC<{ document: Document; onBack: () => void; onU
                             <span className="text-gray-600">Seller:</span>
                             <span className="font-semibold text-gray-800">{document.issuerName}</span>
                         </div>
+                        {document.logbookImageUrl && (
+                             <div className="pt-2">
+                                <button onClick={() => setIsLogbookModalOpen(true)} className="text-sm text-blue-600 font-semibold hover:underline">
+                                    View Logbook
+                                </button>
+                            </div>
+                        )}
                     </div>
                  </div>
 
@@ -130,7 +149,7 @@ const DocumentDetailView: React.FC<{ document: Document; onBack: () => void; onU
                 </div>
 
                 <div className="pt-2 space-y-3">
-                    {document.isAsset && (
+                    {document.isAsset && document.ownerPhone === currentUser.phone && (
                         <button onClick={handleTransfer} disabled={!!document.pendingOwnerPhone} className="w-full bg-brand-dark text-white font-bold py-3 rounded-xl shadow-md hover:bg-gray-800 transition disabled:bg-gray-400 disabled:cursor-not-allowed">
                             {document.pendingOwnerPhone ? 'Transfer Pending' : 'Transfer Asset'}
                         </button>
@@ -138,12 +157,20 @@ const DocumentDetailView: React.FC<{ document: Document; onBack: () => void; onU
                     {document.type === 'Receipt' && document.verificationStatus === 'Unverified' && (
                         <button onClick={handleRequestVerification} className="w-full bg-blue-500 text-white font-bold py-3 rounded-xl hover:bg-blue-600 transition">Request Seller Verification</button>
                     )}
+                     <button onClick={() => alert("Coming soon: Sell this verified asset on Tukosoko!")} className="w-full bg-green-600 text-white font-bold py-3 rounded-xl shadow-md hover:bg-green-700 transition">
+                        Sell This Asset
+                    </button>
                 </div>
             </div>
 
             {isReceiptModalOpen && document.scannedImageUrl && (
                 <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4" onClick={() => setIsReceiptModalOpen(false)}>
                     <img src={document.scannedImageUrl} alt="Full receipt" className="max-w-full max-h-full rounded-lg" onClick={e => e.stopPropagation()} />
+                </div>
+            )}
+            {isLogbookModalOpen && document.logbookImageUrl && (
+                <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4" onClick={() => setIsLogbookModalOpen(false)}>
+                    <img src={document.logbookImageUrl} alt="Logbook" className="max-w-full max-h-full rounded-lg" onClick={e => e.stopPropagation()} />
                 </div>
             )}
         </div>

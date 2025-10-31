@@ -19,6 +19,8 @@ const CatalogueIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h
 const SettingsIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>;
 const LogoutIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>;
 const AdminIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.286zm0 13.036h.008v.008h-.008v-.008z" /></svg>;
+const AssetRegistryIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>;
+
 
 const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose, onNavigate, currentUser, isSuperAdmin, onLogout }) => {
   const menuItems: { label: string; page: CurrentPage | 'profile'; icon: React.ReactNode }[] = [
@@ -26,6 +28,7 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose, onNavigate, curren
     { label: 'My Contacts', page: 'mycontacts', icon: <ContactsIcon /> },
     { label: 'My Tickets', page: 'mytickets', icon: <TicketsIcon /> },
     { label: 'My Catalogue', page: 'mycatalogue', icon: <CatalogueIcon /> },
+    { label: 'Asset Registry', page: 'assetRegistry', icon: <AssetRegistryIcon /> },
     { label: 'Settings', page: 'settings', icon: <SettingsIcon /> },
   ];
 
@@ -45,20 +48,20 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose, onNavigate, curren
     >
       <div className="absolute inset-0 bg-black bg-opacity-60" onClick={onClose}></div>
       <div
-        className={`relative w-4/5 max-w-xs h-full bg-brand-dark text-white shadow-2xl flex flex-col transition-transform duration-300 ease-out ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
+        className={`relative w-4/5 max-w-xs h-full bg-brand-navy text-white shadow-2xl flex flex-col transition-transform duration-300 ease-out ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
         style={{ fontFamily: "'Poppins', sans-serif" }}
       >
         {/* Logo Section */}
-        <div className="p-6 text-left border-b border-gray-700">
-            <div className="font-bold text-4xl tracking-tighter">$KILL</div>
+        <div className="p-6 text-left border-b border-white/10">
+            <div className="font-extrabold text-4xl tracking-tighter"><span className="text-brand-gold">$</span>KILL</div>
             <p className="text-sm text-gray-400">the borderless currency</p>
         </div>
         
         {/* User Profile Section */}
         {currentUser && (
-            <header className="p-6 border-b border-gray-700">
+            <header className="p-6 border-b border-white/10">
                 <div className="flex items-center gap-4">
-                    <img src={currentUser.avatarUrl || 'https://i.pravatar.cc/150?img=5'} alt="User Avatar" className="w-16 h-16 rounded-full border-2 border-white/30" />
+                    <img src={currentUser.avatarUrl || 'https://i.pravatar.cc/150?img=5'} alt="User Avatar" className="w-14 h-14 rounded-full border-2 border-white/30" />
                     <div>
                         <p className="font-semibold text-lg">{currentUser.name}</p>
                         <p className="text-xs text-gray-400">{currentUser.service}</p>
@@ -73,7 +76,7 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose, onNavigate, curren
             <button
               key={item.page}
               onClick={() => handleNavigate(item.page)}
-              className="w-full flex items-center gap-4 text-left px-4 py-3 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white transition-colors"
+              className="w-full flex items-center gap-4 text-left px-4 py-3 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors"
             >
               {item.icon}
               <span className="font-medium">{item.label}</span>
@@ -82,17 +85,17 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose, onNavigate, curren
           {isSuperAdmin && (
              <button
               onClick={() => handleNavigate('admin')}
-              className="w-full flex items-center gap-4 text-left px-4 py-3 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white transition-colors"
+              className="w-full flex items-center gap-4 text-left px-4 py-3 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors"
             >
               <AdminIcon />
-              <span className="font-medium">Admin</span>
+              <span className="font-medium">Admin Panel</span>
             </button>
           )}
         </nav>
         
         {/* Logout Section */}
-        <footer className="p-4 border-t border-gray-700">
-          <button onClick={handleLogout} className="w-full flex items-center gap-4 text-left px-4 py-3 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white transition-colors">
+        <footer className="p-4 border-t border-white/10">
+          <button onClick={handleLogout} className="w-full flex items-center gap-4 text-left px-4 py-3 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors">
             <LogoutIcon />
             <span className="font-medium">Logout</span>
           </button>

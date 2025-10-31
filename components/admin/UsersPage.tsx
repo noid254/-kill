@@ -5,7 +5,8 @@ interface UsersPageProps {
     providers: ServiceProvider[];
     onViewProvider: (provider: ServiceProvider) => void;
     onUpdateProvider: (provider: ServiceProvider) => void;
-    onDeleteProvider: (id: number) => void;
+    // FIX: Changed id type from number to string to match ServiceProvider type.
+    onDeleteProvider: (id: string) => void;
 }
 
 const UsersPage: React.FC<UsersPageProps> = ({ providers, onViewProvider, onUpdateProvider, onDeleteProvider }) => {

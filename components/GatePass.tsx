@@ -10,7 +10,8 @@ type GatePassProps = {
     isAuthenticated: boolean;
     invitations: Invitation[];
     onCreateInvitation: (data: Omit<Invitation, 'id' | 'status' | 'accessCode' | 'hostName' | 'type'>) => Promise<void>;
-    onCreateKnock: (data: Omit<Invitation, 'id' | 'status' | 'accessCode' | 'type'>) => Promise<void>;
+    // FIX: Made onCreateKnock consistent with onCreateInvitation by omitting hostName, which will be added by the parent component.
+    onCreateKnock: (data: Omit<Invitation, 'id' | 'status' | 'accessCode' | 'hostName' | 'type'>) => Promise<void>;
     onUpdateInvitationStatus: (id: string, status: Invitation['status']) => Promise<void>;
     onAuthClick: () => void;
     onGoToSignup: () => void;
@@ -39,66 +40,6 @@ const VisitorPass: React.FC<{ pass: Invitation }> = ({ pass }) => (
     </div>
 );
 
-const PremiseLandingModal: React.FC<{
-    onClose: () => void;
-    onKnock: (apartment: string) => void;
-    isAuthenticated: boolean;
-    onAuthClick: () => void;
-}> = ({ onClose, onKnock, isAuthenticated, onAuthClick }) => {
-    const [showCallMenu, setShowCallMenu] = useState(false);
-    const [isKnocking, setIsKnocking] = useState(false);
-    const [apartment, setApartment] = useState('');
-
-    const handleKnock = () => {
-        if(!isAuthenticated) {
-            onAuthClick();
-            return;
-        }
-        setIsKnocking(true);
-    }
-    
-    const submitKnock = () => {
-        if(apartment.trim()) {
-            onKnock(apartment.trim());
-        }
-    }
-
-    return (
-         <div className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50 p-4" onClick={onClose}>
-            <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-xs text-center" onClick={e => e.stopPropagation()}>
-                <h2 className="text-2xl font-bold">{PREMISE_CONTACTS.name}</h2>
-                <p className="text-gray-600 mt-1">Welcome! Please select an option.</p>
-                
-                {isKnocking ? (
-                    <div className="mt-6">
-                        <label htmlFor="apartment" className="font-semibold">Who are you visiting? (Apt No.)</label>
-                        <input 
-                            id="apartment" type="text" value={apartment} onChange={e => setApartment(e.target.value.toUpperCase())}
-                            placeholder="e.g. C5" autoFocus
-                            className="w-full text-center text-2xl font-bold p-2 border-b-2 mt-2 focus:outline-none focus:border-brand-primary"
-                        />
-                         <button onClick={submitKnock} className="mt-6 w-full bg-brand-primary text-white font-bold py-3 px-4 rounded-lg">Send Request</button>
-                    </div>
-                ) : (
-                    <div className="mt-6 space-y-3">
-                        <div className="relative">
-                            <button onClick={() => setShowCallMenu(p => !p)} className="w-full border-2 border-brand-primary text-brand-primary font-bold py-3 px-4 rounded-lg">Call</button>
-                            {showCallMenu && (
-                                <div className="mt-2 space-y-2">
-                                    {PREMISE_CONTACTS.contacts.map(c => (
-                                        <a key={c.name} href={`tel:${c.phone}`} className="block w-full bg-gray-100 text-gray-800 p-3 rounded-lg">{c.name}</a>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                        <button onClick={handleKnock} className="w-full bg-brand-primary text-white font-bold py-3 px-4 rounded-lg">Ring Bell (Knock Knock)</button>
-                    </div>
-                )}
-            </div>
-        </div>
-    )
-}
-
 const RegisterPremiseModal: React.FC<{ onClose: () => void, onRegister: (name: string) => void }> = ({ onClose, onRegister }) => {
     const [name, setName] = useState('');
     return (
@@ -124,7 +65,6 @@ const RegisterPremiseModal: React.FC<{ onClose: () => void, onRegister: (name: s
 const GatePass: React.FC<GatePassProps> = ({ currentUser, isSuperAdmin, isAuthenticated, invitations, onCreateInvitation, onCreateKnock, onUpdateInvitationStatus, onAuthClick, onGoToSignup, allProviders }) => {
     const [view, setView] = useState<'requests' | 'invites' | 'history'>('requests');
     const [isInviting, setIsInviting] = useState(false);
-    const [isSimulating, setIsSimulating] = useState(false);
     const [isRegistering, setIsRegistering] = useState(false);
     const [visitorPhone, setVisitorPhone] = useState('');
     const [visitDate, setVisitDate] = useState(new Date().toISOString().split('T')[0]);
@@ -163,20 +103,6 @@ const GatePass: React.FC<GatePassProps> = ({ currentUser, isSuperAdmin, isAuthen
         }
     };
 
-    const handleKnockSubmit = async (apartment: string) => {
-        if (!currentUser || !currentUser.id) return;
-        // In a real app, you'd look up the host by apartment number. Here we'll assign to a mock host.
-        const mockHost = allProviders.find(p => p.id === 1)!;
-        await onCreateKnock({ 
-            hostId: mockHost.id,
-            hostName: mockHost.name,
-            hostApartment: apartment,
-            visitorId: currentUser.id,
-            visitorPhone: currentUser.phone!,
-            visitDate: new Date().toISOString().split('T')[0],
-        });
-        setIsSimulating(false);
-    }
     
     const handleRegisterPremise = async (name: string) => {
         if (!currentUser || !currentUser.id) return;
@@ -240,7 +166,6 @@ const GatePass: React.FC<GatePassProps> = ({ currentUser, isSuperAdmin, isAuthen
 
     return (
         <div className="bg-gray-50 min-h-full font-sans p-4 space-y-4">
-            {isSimulating && <PremiseLandingModal onClose={() => setIsSimulating(false)} onKnock={handleKnockSubmit} isAuthenticated={isAuthenticated} onAuthClick={onAuthClick}/>}
             {isRegistering && <RegisterPremiseModal onClose={() => setIsRegistering(false)} onRegister={handleRegisterPremise} />}
             
             <header>
@@ -248,10 +173,9 @@ const GatePass: React.FC<GatePassProps> = ({ currentUser, isSuperAdmin, isAuthen
                 <p className="text-gray-600">Visitor Management for {currentUser.name}</p>
             </header>
             
-            <div className="grid grid-cols-2 gap-2">
-                <button onClick={() => setIsSimulating(true)} className="w-full bg-white p-3 rounded-lg shadow-sm font-semibold text-center hover:bg-gray-100 text-sm">Simulate Visitor</button>
-                <button onClick={() => setIsRegistering(true)} className="w-full bg-white p-3 rounded-lg shadow-sm font-semibold text-center hover:bg-gray-100 text-sm">Register Premise</button>
-            </div>
+            <button onClick={() => setIsRegistering(true)} className="w-full bg-white p-3 rounded-lg shadow-sm font-semibold text-center hover:bg-gray-100 text-sm">
+                Register a New Premise
+            </button>
 
 
             {isInviting ? (

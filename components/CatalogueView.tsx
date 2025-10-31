@@ -34,9 +34,11 @@ const CatalogueFormModal: React.FC<{ onSave: (item: Omit<CatalogueItem, 'id' | '
     const [price, setPrice] = useState('');
     const [description, setDescription] = useState('');
     const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+    const [duration, setDuration] = useState('');
+    const [discountInfo, setDiscountInfo] = useState('');
     const fileInputRef = useRef<HTMLInputElement>(null);
     
-    const categories: CatalogueCategory[] = ['Product', 'Service', 'For Rent', 'For Sale'];
+    const categories: CatalogueCategory[] = ['Product', 'Service', 'Professional Service', 'For Rent', 'For Sale'];
     const maxImages = ['For Rent', 'For Sale'].includes(category) ? 5 : 3;
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -63,7 +65,9 @@ const CatalogueFormModal: React.FC<{ onSave: (item: Omit<CatalogueItem, 'id' | '
         }
         onSave({
             title, category, price, description,
-            imageUrls: imagePreviews.length > 0 ? imagePreviews : [`https://picsum.photos/seed/${title.replace(/\s/g, '')}/400/300`]
+            imageUrls: imagePreviews.length > 0 ? imagePreviews : [`https://picsum.photos/seed/${title.replace(/\s/g, '')}/400/300`],
+            duration: category === 'Professional Service' ? duration : undefined,
+            discountInfo: category === 'Professional Service' ? discountInfo : undefined,
         });
     };
     
@@ -78,6 +82,14 @@ const CatalogueFormModal: React.FC<{ onSave: (item: Omit<CatalogueItem, 'id' | '
                     </select>
                     <input value={price} onChange={e => setPrice(e.target.value)} type="text" placeholder="Price (e.g., Ksh 5,000)" className="w-full p-2 border rounded"/>
                     <textarea value={description} onChange={e => setDescription(e.target.value)} placeholder="Description" rows={3} className="w-full p-2 border rounded"/>
+                    
+                    {category === 'Professional Service' && (
+                        <>
+                            <input value={duration} onChange={e => setDuration(e.target.value)} type="text" placeholder="Duration (e.g., 7 hours total)" className="w-full p-2 border rounded"/>
+                            <input value={discountInfo} onChange={e => setDiscountInfo(e.target.value)} type="text" placeholder="Discount Info (e.g., 30% off full course)" className="w-full p-2 border rounded"/>
+                        </>
+                    )}
+
                     <div>
                         <label className="text-xs font-medium text-gray-700 mb-1 block">Images (up to {maxImages})</label>
                         <div className="grid grid-cols-3 gap-2">
@@ -128,7 +140,9 @@ const CatalogueView: React.FC<CatalogueViewProps> = ({ items, onUpdateItems, cur
     const catalogueUrl = `https://nikosoko.app/catalogue/${currentUser?.id}`;
     
     const handleSaveItem = (item: Omit<CatalogueItem, 'id' | 'providerId'>) => {
-        const newItem: CatalogueItem = { id: Date.now(), providerId: currentUser?.id || 0, ...item };
+        // FIX: Ensure currentUser and id exist before creating an item. Convert Date.now() to a string for the ID.
+        if (!currentUser?.id) return;
+        const newItem: CatalogueItem = { id: Date.now().toString(), providerId: currentUser.id, ...item };
         onUpdateItems([...items, newItem]);
         setIsAdding(false);
     };
@@ -147,7 +161,7 @@ const CatalogueView: React.FC<CatalogueViewProps> = ({ items, onUpdateItems, cur
         return items.filter(item => item.category === activeFilter);
     }, [items, activeFilter]);
     
-    const filterOptions: (CatalogueCategory | 'All')[] = ['All', 'Product', 'Service', 'For Rent', 'For Sale'];
+    const filterOptions: (CatalogueCategory | 'All')[] = ['All', 'Product', 'Service', 'Professional Service', 'For Rent', 'For Sale'];
 
     return (
         <div className="bg-slate-50 min-h-screen font-sans">
@@ -159,11 +173,11 @@ const CatalogueView: React.FC<CatalogueViewProps> = ({ items, onUpdateItems, cur
                 <img 
                     src={currentUser?.catalogueBannerUrl || 'https://picsum.photos/seed/defaultcatbanner/800/400'} 
                     alt="Catalogue Banner" 
-                    className="absolute inset-0 w-full h-full object-cover rounded-b-3xl animate-fade-in" 
+                    className="absolute inset-0 w-full h-full object-cover animate-fade-in" 
                 />
                 <button 
                     onClick={() => bannerInputRef.current?.click()}
-                    className="absolute inset-0 bg-black/40 rounded-b-3xl opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-sm font-semibold transition-opacity"
+                    className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-sm font-semibold transition-opacity"
                 >
                     Change Banner
                 </button>

@@ -1,5 +1,6 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import type { Document } from '../types';
+import * as api from '../services/api';
 import LoadingSpinner from './LoadingSpinner';
 
 interface OwnershipCheckViewProps {
@@ -7,66 +8,67 @@ interface OwnershipCheckViewProps {
 }
 
 const OwnershipCheckView: React.FC<OwnershipCheckViewProps> = ({ allDocuments }) => {
-    const [serial, setSerial] = useState('');
+    const [identifier, setIdentifier] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [result, setResult] = useState<Document | null | 'not_found'>(null);
 
-    const handleSearch = (e: React.FormEvent) => {
+    const handleSearch = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!serial.trim()) return;
+        if (!identifier.trim()) return;
         
         setIsLoading(true);
         setResult(null);
 
-        // Simulate network request
-        setTimeout(() => {
-            const foundAsset = allDocuments.find(doc => 
-                doc.isAsset && doc.items?.some(item => item.serial?.toLowerCase() === serial.trim().toLowerCase())
-            );
-            setResult(foundAsset || 'not_found');
+        try {
+            const foundAsset = await api.searchAssetBySerialOrReg(identifier.trim());
+            setResult(foundAsset);
+        } catch (error) {
+            setResult('not_found');
+        } finally {
             setIsLoading(false);
-        }, 750);
+        }
     };
 
     return (
         <div className="p-4 bg-gray-50 min-h-full">
-            <h1 className="text-2xl font-bold text-gray-800 mb-2">Confirm Asset Ownership</h1>
-            <p className="text-gray-600 mb-6">Enter an asset's serial number or IMEI to find its registered owner.</p>
-            
-            <form onSubmit={handleSearch} className="bg-white p-4 rounded-lg shadow-sm space-y-3">
-                <input 
-                    type="text" 
-                    value={serial}
-                    onChange={e => setSerial(e.target.value)}
-                    placeholder="Enter Serial Number or IMEI" 
-                    className="w-full p-3 border rounded-lg"
-                    autoFocus
-                />
-                <button type="submit" disabled={isLoading} className="w-full bg-brand-dark text-white font-bold py-3 px-4 rounded-lg disabled:bg-gray-400">
-                    {isLoading ? 'Searching...' : 'Search'}
-                </button>
-            </form>
+            <div className="bg-white p-4 rounded-xl shadow-sm border">
+                <h1 className="text-xl font-bold text-gray-800 mb-2">Confirm Asset Ownership</h1>
+                <p className="text-sm text-gray-600 mb-4">Enter an asset's serial number or vehicle registration plate to find its registered owner.</p>
+                
+                <form onSubmit={handleSearch} className="space-y-3">
+                    <input 
+                        type="text" 
+                        value={identifier}
+                        onChange={e => setIdentifier(e.target.value)}
+                        placeholder="Enter Serial or Reg. Number" 
+                        className="w-full p-3 border rounded-lg"
+                        autoFocus
+                    />
+                    <button type="submit" disabled={isLoading} className="w-full bg-brand-dark text-white font-bold py-3 px-4 rounded-lg disabled:bg-gray-400">
+                        {isLoading ? 'Searching...' : 'Search'}
+                    </button>
+                </form>
+            </div>
 
             <div className="mt-6">
-                {isLoading && <LoadingSpinner message="Checking database..." />}
+                {isLoading && <LoadingSpinner message="Checking asset database..." />}
                 
                 {result && result !== 'not_found' && (
-                    <div className="bg-white p-4 rounded-lg shadow-md border-l-4 border-green-500">
-                        <h3 className="font-bold text-lg text-green-700">Asset Found</h3>
+                    <div className="bg-white p-4 rounded-xl shadow-md border-l-4 border-green-500 animate-fade-in">
+                        <h3 className="font-bold text-lg text-green-800">Asset Found & Verified</h3>
                         <div className="mt-3 space-y-2 text-sm">
-                            <p><strong>Item:</strong> {result.items?.[0]?.description}</p>
-                            <p><strong>Registered Owner:</strong> {result.ownerPhone ? '******' + result.ownerPhone.slice(-4) : 'N/A'}</p>
-                            <p><strong>Seller:</strong> {result.issuerName}</p>
-                            <p><strong>Purchase Date:</strong> {new Date(result.date).toLocaleDateString()}</p>
-                            <p className="mt-2 text-xs text-gray-500">Owner's full contact details are masked for privacy.</p>
+                            <p><strong>Item:</strong> {result.items?.[0]?.description || result.model}</p>
+                            <p><strong>Identifier:</strong> {result.registrationNumber || result.items?.[0]?.serial}</p>
+                            <p><strong>Registered Owner:</strong> {result.ownerPhone ? `****` + result.ownerPhone.slice(-4) : 'N/A'}</p>
+                             <p className="mt-3 text-xs text-gray-500">Owner's full contact details are masked for privacy. This item is confirmed to be registered on the $KILL platform.</p>
                         </div>
                     </div>
                 )}
 
                 {result === 'not_found' && (
-                    <div className="bg-white p-4 rounded-lg shadow-md border-l-4 border-red-500">
-                         <h3 className="font-bold text-lg text-red-700">Asset Not Found</h3>
-                         <p className="mt-2 text-sm text-gray-700">No asset with this serial number is registered in the Niko Soko database. The item may be unregistered or the serial number is incorrect.</p>
+                    <div className="bg-white p-4 rounded-xl shadow-md border-l-4 border-red-500 animate-fade-in">
+                         <h3 className="font-bold text-lg text-red-800">Asset Not Found</h3>
+                         <p className="mt-2 text-sm text-gray-700">No asset with this identifier is registered in the $KILL database. The item may be unregistered or the identifier is incorrect. Proceed with caution.</p>
                     </div>
                 )}
             </div>

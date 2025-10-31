@@ -2,7 +2,7 @@
 export type Page = 'home' | 'tickets' | 'explore' | 'orders' | 'profile' | 'contacts';
 
 export interface Member {
-  id: number;
+  id: string;
   name: string;
   avatarUrl: string;
   rating: number;
@@ -23,12 +23,12 @@ export interface Skill {
     type: 'institution' | 'mentor';
     name: string;
     details: string;
-    verifierId?: number; // Optional: Link to another ServiceProvider profile
+    verifierId?: string; // Optional: Link to another ServiceProvider profile
   };
 }
 
 export interface ServiceProvider {
-  id: number;
+  id: string;
   name: string;
   phone: string;
   whatsapp?: string;
@@ -60,7 +60,7 @@ export interface ServiceProvider {
     treasurer: string; // phone number
   };
   joinRequests?: {
-    userId: number;
+    userId: string;
     userName: string;
     userPhone: string;
     status: 'pending' | 'approved' | 'rejected';
@@ -70,8 +70,8 @@ export interface ServiceProvider {
 }
 
 export interface Gig {
-  id: number;
-  providerId: number;
+  id: string;
+  providerId: string;
   title: string;
   category: string;
   description: string;
@@ -83,7 +83,7 @@ export interface Gig {
 }
 
 export interface Event {
-    id: number;
+    id: string;
     name: string;
     date: string; // Keep as ISO string for sorting/parsing
     location: string;
@@ -108,7 +108,7 @@ export interface Event {
 
 export interface Ticket {
   id: string;
-  eventId: number;
+  eventId: string;
   eventName: string;
   eventDate: string;
   eventLocation: string;
@@ -118,21 +118,24 @@ export interface Ticket {
   eventCoverUrl: string;
 }
 
-export type CatalogueCategory = 'For Rent' | 'For Sale' | 'Product' | 'Service';
+export type CatalogueCategory = 'For Rent' | 'For Sale' | 'Product' | 'Service' | 'Professional Service';
 
 export interface CatalogueItem {
-  id: number;
-  providerId: number;
+  id: string;
+  providerId: string;
   title: string;
   category: CatalogueCategory;
   description: string;
   price: string;
   imageUrls: string[];
   externalLink?: string;
+  duration?: string;
+  discountInfo?: string;
+  verifiedAssetId?: string; // Link to a verified asset in the Document DB
 }
 
 export interface SpecialBanner {
-  id: number;
+  id: string;
   imageUrl: string;
   targetCategory?: string;
   targetLocation?: string;
@@ -165,7 +168,7 @@ export interface Document {
   currency: string;
   paymentStatus: 'Paid' | 'Pending' | 'Overdue' | 'Draft'; // 'status' renamed
 
-  // New fields for receipts/assets
+  // Fields for assets
   items?: DocumentItem[];
   scannedImageUrl?: string;
   verificationStatus?: 'Unverified' | 'Pending' | 'Verified' | 'Rejected';
@@ -174,16 +177,23 @@ export interface Document {
   productImages?: string[];
   specifications?: string;
   pendingOwnerPhone?: string;
+
+  // New detailed asset fields
+  assetType?: 'Vehicle' | 'Tool' | 'Electronics' | 'Other';
+  registrationNumber?: string; // For vehicles
+  model?: string; // For vehicles, tools, electronics
+  yearOfManufacture?: string; // For vehicles
+  logbookImageUrl?: string; // For vehicle verification
 }
 
 
 export interface Invitation {
   id: string;
-  hostId: number;
+  hostId: string;
   hostName: string;
   hostApartment?: string;
   visitorPhone: string;
-  visitorId?: number;
+  visitorId?: string;
   visitorName?: string;
   visitorAvatar?: string;
   visitDate: string;
@@ -199,7 +209,7 @@ export interface BusinessAssets {
 }
 
 export interface InboxMessage {
-  id: number;
+  id: string;
   recipientPhone?: string; // Target specific user inboxes
   from: string;
   subject: string;
@@ -208,10 +218,10 @@ export interface InboxMessage {
   isRead: boolean;
   action?: {
     type: 'saccoJoinRequest' | 'assetTransfer' | 'gigApplication';
-    organizationId?: number;
-    requesterId?: number;
+    organizationId?: string;
+    requesterId?: string;
     documentId?: string;
-    gigId?: number;
+    gigId?: string;
   };
   requesterProfile?: Partial<ServiceProvider>; // For attaching profile cards to messages
 }
@@ -219,6 +229,6 @@ export interface InboxMessage {
 export interface Premise {
     id: string;
     name: string;
-    superhostId: number;
-    hosts: number[];
+    superhostId: string;
+    hosts: string[];
 }

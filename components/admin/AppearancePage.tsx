@@ -5,7 +5,8 @@ interface AppearancePageProps {
     categories: string[];
     specialBanners: SpecialBanner[];
     onAddBanner: (banner: Omit<SpecialBanner, 'id'>) => void;
-    onDeleteBanner: (bannerId: number) => void;
+    // FIX: Changed bannerId type from number to string to match the SpecialBanner type.
+    onDeleteBanner: (bannerId: string) => void;
 }
 
 const AppearancePage: React.FC<AppearancePageProps> = ({ categories, specialBanners, onAddBanner, onDeleteBanner }) => {

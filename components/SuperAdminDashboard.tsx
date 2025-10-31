@@ -13,7 +13,7 @@ interface SuperAdminDashboardProps {
     onBack: () => void;
     providers: ServiceProvider[];
     onUpdateProvider: (provider: ServiceProvider) => void;
-    onDeleteProvider: (providerId: number) => void;
+    onDeleteProvider: (providerId: string) => void;
     onViewProvider: (provider: ServiceProvider) => void;
     categories: string[];
     onAddCategory: (name: string) => void;
@@ -22,10 +22,10 @@ interface SuperAdminDashboardProps {
     initialPage?: AdminPage;
     specialBanners: SpecialBanner[];
     onAddBanner: (banner: Omit<SpecialBanner, 'id'>) => void;
-    onDeleteBanner: (bannerId: number) => void;
+    onDeleteBanner: (bannerId: string) => void;
     onCreateOrganization: (orgData: any) => void;
-    onApproveRequest: (orgId: number, userId: number) => void;
-    onRejectRequest: (orgId: number, userId: number) => void;
+    onApproveRequest: (orgId: string, userId: string) => void;
+    onRejectRequest: (orgId: string, userId: string) => void;
 }
 
 export type AdminPage = 'Dashboard' | 'Users' | 'Analytics' | 'Appearance' | 'Broadcast' | 'Categories' | 'Organizations';

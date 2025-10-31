@@ -3,7 +3,7 @@ import * as api from '../services/api';
 
 interface AuthModalProps {
   onClose: () => void;
-  onLogin: (data: api.VerifyOtpResponse) => void;
+  onLogin: (data: api.VerifyOtpResponse, phone: string) => void;
 }
 
 const AuthModal: React.FC<AuthModalProps> = ({ onClose, onLogin }) => {
@@ -52,8 +52,9 @@ const AuthModal: React.FC<AuthModalProps> = ({ onClose, onLogin }) => {
     setIsLoading(true);
     setError('');
     try {
-        const response = await api.verifyOtp(`254${phone}`, otp);
-        onLogin(response);
+        const fullPhone = `254${phone}`;
+        const response = await api.verifyOtp(fullPhone, otp);
+        onLogin(response, fullPhone);
     } catch (err: any) {
         setError(err.message || "Login failed.");
     } finally {
@@ -76,7 +77,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ onClose, onLogin }) => {
             <p className="text-gray-600 mb-4">Enter your phone number to continue.</p>
             <div className="mb-6">
               <label htmlFor="phone" className="block text-sm font-medium text-gray-700">Phone Number</label>
-              <div className="flex items-center mt-1 bg-gray-100 rounded-lg shadow-inner focus-within:ring-2 focus-within:ring-brand-primary">
+              <div className="flex items-center mt-1 bg-gray-100 rounded-lg shadow-inner focus-within:ring-2 focus-within:ring-brand-gold">
                   <span className="px-3 text-gray-500 border-r border-gray-300">+254</span>
                   <input 
                       type="tel" 
@@ -90,7 +91,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ onClose, onLogin }) => {
                   />
               </div>
             </div>
-            <button type="submit" disabled={isLoading} className="w-full bg-brand-primary text-white font-bold py-2 px-4 rounded-lg hover:bg-gray-700 transition-colors disabled:bg-gray-400 active-scale">
+            <button type="submit" disabled={isLoading} className="w-full bg-brand-gold text-brand-navy font-bold py-2 px-4 rounded-lg hover:opacity-90 transition-colors disabled:bg-gray-400 active-scale">
               {isLoading ? 'Sending OTP...' : 'Continue'}
             </button>
           </form>
@@ -110,11 +111,11 @@ const AuthModal: React.FC<AuthModalProps> = ({ onClose, onLogin }) => {
                 onChange={handleOtpChange} 
                 required 
                 autoFocus 
-                className="mt-1 block w-full text-center tracking-[1em] text-lg px-3 py-3 border-0 bg-gray-100 rounded-lg shadow-inner focus:outline-none focus:ring-2 focus:ring-brand-primary sm:text-sm"
+                className="mt-1 block w-full text-center tracking-[1em] text-lg px-3 py-3 border-0 bg-gray-100 rounded-lg shadow-inner focus:outline-none focus:ring-2 focus:ring-brand-gold sm:text-sm"
               />
               <p className="text-xs text-center text-gray-500 mt-2">(For demo, use OTP: 1234)</p>
             </div>
-            <button type="submit" disabled={isLoading} className="w-full bg-brand-primary text-white font-bold py-2 px-4 rounded-lg hover:bg-gray-700 transition-colors disabled:bg-gray-400 active-scale">
+            <button type="submit" disabled={isLoading} className="w-full bg-brand-gold text-brand-navy font-bold py-2 px-4 rounded-lg hover:opacity-90 transition-colors disabled:bg-gray-400 active-scale">
                 {isLoading ? 'Verifying...' : 'Confirm & Sign In'}
             </button>
           </form>

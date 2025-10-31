@@ -11,11 +11,11 @@ interface ProfileViewProps {
   onBack: () => void;
   onLogout: () => void;
   onUpdate: (updatedProfile: ServiceProvider) => void;
-  onDelete: (providerId: number) => void;
+  onDelete: (providerId: string) => void;
   onContactClick: () => void;
   onInitiateContact: (provider: ServiceProvider) => boolean;
-  savedContacts: number[];
-  onToggleSaveContact: (providerId: number) => void;
+  savedContacts: string[];
+  onToggleSaveContact: (providerId: string) => void;
   catalogueItems: CatalogueItem[];
   onBook: (provider: ServiceProvider) => void;
   onJoin: (provider: ServiceProvider) => void;
@@ -64,12 +64,12 @@ const CatalogueItemCard: React.FC<{item: CatalogueItem, onClick?: () => void}> =
         <div className="p-2">
             <h3 className="font-bold text-gray-800 text-sm truncate">{item.title}</h3>
             <p className="text-xs text-gray-500 mt-1 truncate">{item.description}</p>
-            <p className="text-sm font-semibold text-brand-dark mt-2">{item.price}</p>
+            <p className="text-sm font-semibold text-brand-navy mt-2">{item.price}</p>
         </div>
     </div>
 );
 
-const MembersScroller: React.FC<{ members: Member[], selectedMemberId: number, onSelectMember: (member: Member) => void }> = ({ members, selectedMemberId, onSelectMember }) => {
+const MembersScroller: React.FC<{ members: Member[], selectedMemberId: string, onSelectMember: (member: Member) => void }> = ({ members, selectedMemberId, onSelectMember }) => {
     return (
         <div className="px-4 py-3 bg-gray-100 border-t border-b border-gray-200">
             <div className="flex space-x-2 overflow-x-auto no-scrollbar">
@@ -77,12 +77,12 @@ const MembersScroller: React.FC<{ members: Member[], selectedMemberId: number, o
                     <button 
                         key={member.id} 
                         onClick={() => onSelectMember(member)} 
-                        className={`flex-shrink-0 flex flex-col items-center gap-1 text-center w-20 p-1 rounded-lg transition-all duration-200 ${selectedMemberId === member.id ? 'bg-brand-primary/10' : 'bg-transparent'}`}
+                        className={`flex-shrink-0 flex flex-col items-center gap-1 text-center w-20 p-1 rounded-lg transition-all duration-200 ${selectedMemberId === member.id ? 'bg-brand-gold/10' : 'bg-transparent'}`}
                     >
-                        <div className={`w-16 h-16 rounded-full border-2 p-0.5 transition-all ${selectedMemberId === member.id ? 'border-brand-primary' : 'border-gray-300'}`}>
+                        <div className={`w-16 h-16 rounded-full border-2 p-0.5 transition-all ${selectedMemberId === member.id ? 'border-brand-gold' : 'border-gray-300'}`}>
                             <img src={member.avatarUrl} alt={member.name} className="w-full h-full object-cover rounded-full" />
                         </div>
-                        <p className={`text-xs font-semibold truncate w-full ${selectedMemberId === member.id ? 'text-brand-dark' : 'text-gray-600'}`}>{member.name}</p>
+                        <p className={`text-xs font-semibold truncate w-full ${selectedMemberId === member.id ? 'text-brand-navy' : 'text-gray-600'}`}>{member.name}</p>
                     </button>
                 ))}
             </div>
@@ -124,18 +124,22 @@ const UnverifyModal: React.FC<{onClose: () => void, onUnverify: (reason: string)
     );
 };
 
-const SkillBadge: React.FC<{ skill: Skill; onClick: () => void }> = ({ skill, onClick }) => (
-    <button onClick={onClick} className="flex-shrink-0 flex flex-col items-center gap-1.5 text-center w-24 p-2 rounded-lg hover:bg-gray-100 transition-colors">
-        <div className="relative w-16 h-16 rounded-full border-2 border-gray-200 p-1 bg-white">
+const SkillCard: React.FC<{ skill: Skill; onClick: () => void }> = ({ skill, onClick }) => (
+    <div onClick={onClick} className="flex-shrink-0 flex items-center gap-4 text-left p-3 rounded-lg hover:bg-gray-100 transition-colors bg-white border border-gray-200 shadow-sm w-full cursor-pointer">
+        <div className="relative w-16 h-16">
             <img src={skill.iconUrl} alt={skill.name} className="w-full h-full object-cover rounded-full" />
             {skill.isVerified && (
-                <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5">
-                     <VerifiedIcon className="w-4 h-4 text-blue-500" />
+                <div className="absolute -bottom-0 -right-0 bg-white rounded-full p-0.5">
+                     <VerifiedIcon className="w-5 h-5 text-blue-500" />
                 </div>
             )}
         </div>
-        <p className="text-xs font-semibold text-gray-700 w-full truncate">{skill.name}</p>
-    </button>
+        <div className="flex-1">
+            <p className="font-bold text-gray-800">{skill.name}</p>
+            <p className="text-xs text-gray-500 mt-1">{skill.verifier.type === 'institution' ? 'Verified By:' : 'Mentored By:'}</p>
+            <p className="text-sm font-semibold text-gray-700">{skill.verifier.name}</p>
+        </div>
+    </div>
 );
 
 const SkillDetailModal: React.FC<{ skill: Skill; onClose: () => void }> = ({ skill, onClose }) => {
@@ -152,7 +156,7 @@ const SkillDetailModal: React.FC<{ skill: Skill; onClose: () => void }> = ({ ski
                     <p className="font-bold text-gray-800 text-base mt-1">{skill.verifier.name}</p>
                     <p className="text-gray-600 mt-2">{skill.verifier.details}</p>
                 </div>
-                <button onClick={onClose} className="mt-6 w-full bg-brand-primary text-white font-bold py-3 rounded-lg">Close</button>
+                <button onClick={onClose} className="mt-6 w-full bg-brand-navy text-white font-bold py-3 rounded-lg">Close</button>
             </div>
         </div>
     );
@@ -177,7 +181,8 @@ const ProfileView: React.FC<ProfileViewProps> = ({ profileData, isOwner, isAuthe
     const [showUnverifyModal, setShowUnverifyModal] = useState(false);
     const [selectedCatalogueItem, setSelectedCatalogueItem] = useState<CatalogueItem | null>(null);
     const [selectedSkill, setSelectedSkill] = useState<Skill | null>(null);
-    const [activeTab, setActiveTab] = useState<'works' | 'catalogue' | 'qr'>(profileData.works.length > 0 ? 'works' : 'qr');
+    const [galleryTab, setGalleryTab] = useState<'works' | 'catalogue' | 'qr'>(profileData.works.length > 0 ? 'works' : 'qr');
+    const [mainContentTab, setMainContentTab] = useState<'about' | 'skills'>('about');
     
     const isGroupProfile = profileData.profileType === 'group' && profileData.members && profileData.members.length > 0;
     const [selectedMember, setSelectedMember] = useState<Member | null>(isGroupProfile ? profileData.members![0] : null);
@@ -194,6 +199,7 @@ const ProfileView: React.FC<ProfileViewProps> = ({ profileData, isOwner, isAuthe
     const [editedAvatar, setEditedAvatar] = useState<string | null>(null);
     const [editedRate, setEditedRate] = useState(profileData.hourlyRate.toString());
     const [editedRateType, setEditedRateType] = useState(profileData.rateType);
+    const [editedCtas, setEditedCtas] = useState(profileData.cta || []);
 
     const coverImageInputRef = useRef<HTMLInputElement>(null);
     const avatarImageInputRef = useRef<HTMLInputElement>(null);
@@ -239,6 +245,7 @@ const ProfileView: React.FC<ProfileViewProps> = ({ profileData, isOwner, isAuthe
         avatarUrl: editedAvatar || profileData.avatarUrl,
         hourlyRate: parseInt(editedRate, 10) || 0,
         rateType: editedRateType,
+        cta: editedCtas,
       };
       onUpdate(updatedProfile);
       setIsEditing(false);
@@ -252,6 +259,7 @@ const ProfileView: React.FC<ProfileViewProps> = ({ profileData, isOwner, isAuthe
         setEditedAvatar(null);
         setEditedRate(profileData.hourlyRate.toString());
         setEditedRateType(profileData.rateType);
+        setEditedCtas(profileData.cta || []);
         setIsEditing(false);
     }
     
@@ -307,7 +315,7 @@ const ProfileView: React.FC<ProfileViewProps> = ({ profileData, isOwner, isAuthe
     
     const handleViewCatalogue = () => {
         if (hasCatalogue) {
-            setActiveTab('catalogue');
+            setGalleryTab('catalogue');
         }
     }
 
@@ -368,9 +376,29 @@ const ProfileView: React.FC<ProfileViewProps> = ({ profileData, isOwner, isAuthe
         catalogue: { label: 'Catalogue', icon: <CatalogueIcon />, action: handleViewCatalogue },
         join: { label: 'Join Us', icon: <UserPlusIcon />, action: handleJoin, primary: true },
     };
+    
+    const allCtaOptions: {value: ServiceProvider['cta'][number], label: string}[] = [
+        {value: 'call', label: 'Call'}, {value: 'whatsapp', label: 'WhatsApp'}, {value: 'book', label: 'Book'}, {value: 'catalogue', label: 'Catalogue'}, {value: 'join', label: 'Join Us'},
+    ];
+
+    const handleCtaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { value, checked } = e.target;
+        const ctaValue = value as ServiceProvider['cta'][number];
+        
+        setEditedCtas(prev => {
+            if (checked) {
+                if (prev.length < 2 && !prev.includes(ctaValue)) {
+                    return [...prev, ctaValue];
+                }
+                return prev; // Limit to 2
+            } else {
+                return prev.filter(c => c !== ctaValue);
+            }
+        });
+    };
 
     return (
-        <div className="w-full max-w-sm mx-auto bg-gray-50 min-h-screen font-sans">
+        <div className="w-full max-w-sm mx-auto bg-gray-50 h-screen flex flex-col overflow-hidden font-sans">
             <input type="file" ref={coverImageInputRef} onChange={handleCoverImageChange} accept="image/*" className="hidden" />
             <input type="file" ref={avatarImageInputRef} onChange={handleAvatarImageChange} accept="image/*" className="hidden" />
             
@@ -388,259 +416,297 @@ const ProfileView: React.FC<ProfileViewProps> = ({ profileData, isOwner, isAuthe
             )}
              {selectedSkill && <SkillDetailModal skill={selectedSkill} onClose={() => setSelectedSkill(null)} />}
             
-            {/* Cover and Header */}
-            <div className="relative">
-                <div className="h-40 bg-gray-300 relative">
-                    <img src={editedCoverImage || profileData.coverImageUrl} alt="Cover" className="w-full h-full object-cover" />
-                     {isEditing && (
-                        <button onClick={() => coverImageInputRef.current?.click()} className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center text-white text-sm font-semibold">
-                            Change Banner
-                        </button>
-                    )}
-                </div>
-                 <button onClick={onBack} className="absolute top-3 left-3 bg-black bg-opacity-50 text-white rounded-full p-1.5 z-10 hover:bg-opacity-75 transition">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
-                </button>
-                 <div className="absolute top-3 right-3 flex items-center space-x-2">
-                     {!isOwner && (
-                        <button onClick={handleFlagButtonClick} className="bg-white bg-opacity-80 rounded-full p-2 flex items-center gap-1 text-xs" title="Flag this profile">
-                           <FlagIcon />
-                           {profileData.flagCount > 0 && <span className="font-bold">{profileData.flagCount}</span>}
-                        </button>
-                     )}
-                     {canEdit && !isEditing && (
-                        <div className="relative">
-                            <button onClick={() => setShowMenu(p => !p)} className="bg-white bg-opacity-80 rounded-full p-1.5">
-                                <SettingsIcon />
+            <div>
+                {/* Cover and Header */}
+                <div className="relative">
+                    <div className="h-40 bg-gray-300 relative">
+                        <img src={editedCoverImage || profileData.coverImageUrl} alt="Cover" className="w-full h-full object-cover" />
+                        {isEditing && (
+                            <button onClick={() => coverImageInputRef.current?.click()} className="absolute inset-0 bg-black bg-opacity-40 hover:bg-opacity-60 transition-all flex items-center justify-center text-white text-sm font-semibold">
+                                Change Banner
                             </button>
-                             {showMenu && (
-                                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-20 border border-gray-200">
-                                    <button onClick={() => { setIsEditing(true); setShowMenu(false); }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">Edit Profile</button>
-                                    {isOwner && <button onClick={() => { onLogout(); setShowMenu(false); }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">Logout</button>}
-                                    {isSuperAdmin && <button onClick={() => { handleDelete(); setShowMenu(false); }} className="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100 w-full text-left">Delete Profile</button>}
-                                </div>
+                        )}
+                    </div>
+                    <button onClick={onBack} className="absolute top-3 left-3 bg-black bg-opacity-50 text-white rounded-full p-1.5 z-10 hover:bg-opacity-75 transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+                    </button>
+                    <div className="absolute top-3 right-3 flex items-center space-x-2">
+                        {!isOwner && (
+                            <button onClick={handleFlagButtonClick} className="bg-white bg-opacity-80 rounded-full p-2 flex items-center gap-1 text-xs" title="Flag this profile">
+                            <FlagIcon />
+                            {profileData.flagCount > 0 && <span className="font-bold">{profileData.flagCount}</span>}
+                            </button>
+                        )}
+                        {canEdit && !isEditing && (
+                            <div className="relative">
+                                <button onClick={() => setShowMenu(p => !p)} className="bg-white bg-opacity-80 rounded-full p-1.5">
+                                    <SettingsIcon />
+                                </button>
+                                {showMenu && (
+                                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-20 border border-gray-200">
+                                        <button onClick={() => { setIsEditing(true); setShowMenu(false); }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">Edit Profile</button>
+                                        {isOwner && <button onClick={() => { onLogout(); setShowMenu(false); }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">Logout</button>}
+                                        {isSuperAdmin && <button onClick={() => { handleDelete(); setShowMenu(false); }} className="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100 w-full text-left">Delete Profile</button>}
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                    {/* Profile Pic or Group Avatars */}
+                    {!isGroupProfile && profileData.accountType !== 'organization' && (
+                        <div className="absolute -bottom-12 left-1/2 -translate-x-1/2 w-24 h-24 rounded-full border-4 border-white bg-gray-200 shadow-lg group">
+                            <img className="rounded-full object-cover w-full h-full" src={editedAvatar || profileData.avatarUrl} alt={profileData.name} />
+                            {isEditing && (
+                                <button onClick={() => avatarImageInputRef.current?.click()} className="absolute inset-0 bg-black bg-opacity-40 group-hover:bg-opacity-60 rounded-full flex items-center justify-center text-white text-xs font-semibold transition-all">
+                                    Change
+                                </button>
                             )}
                         </div>
                     )}
-                 </div>
-                 {/* Profile Pic or Group Avatars */}
-                 {!isGroupProfile && (
-                    <div className="absolute -bottom-12 left-1/2 -translate-x-1/2 w-24 h-24 rounded-full border-4 border-white bg-gray-200 shadow-lg group">
-                        <img className="rounded-full object-cover w-full h-full" src={editedAvatar || profileData.avatarUrl} alt={profileData.name} />
-                        {isEditing && (
-                            <button onClick={() => avatarImageInputRef.current?.click()} className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 rounded-full flex items-center justify-center text-white text-xs font-semibold transition-all">
-                                Change
-                            </button>
-                        )}
-                    </div>
-                 )}
-            </div>
-            
-            {/* Profile Info */}
-            <div className={`${isGroupProfile ? 'pt-6' : 'pt-14'} text-center px-4`}>
-                <div className="flex items-center justify-center space-x-2">
-                    <h1 className="text-2xl font-bold text-brand-dark">{profileData.name}</h1>
-                    {profileData.isVerified ? (
-                        <VerifiedIcon 
-                            className="w-6 h-6 text-blue-500" 
-                            onClick={isSuperAdmin ? () => setShowUnverifyModal(true) : undefined}
-                        />
-                     ) : (
-                         isSuperAdmin && !isEditing && <button onClick={handleVerify} className="text-xs bg-yellow-400 text-yellow-900 font-bold px-2 py-1 rounded-md hover:bg-yellow-500">Verify</button>
-                    )}
                 </div>
-                {isEditing ? (
-                    <input 
-                        type="text" 
-                        value={editedService} 
-                        onChange={(e) => setEditedService(e.target.value)} 
-                        className="text-md text-gray-600 bg-gray-100 border border-gray-300 rounded-md text-center mt-1 px-2 py-1"
-                    />
-                ) : (
-                    <p className="text-md text-gray-600">{profileData.service}</p>
-                )}
-                 {isEditing ? (
-                    <input 
-                        type="text" 
-                        value={editedLocation} 
-                        onChange={(e) => setEditedLocation(e.target.value)} 
-                        placeholder="e.g. Westlands, Nairobi"
-                        className="text-sm text-gray-500 bg-gray-100 border border-gray-300 rounded-md text-center mt-1 px-2 py-1"
-                    />
-                ) : (
-                    <p className="text-sm text-gray-500 mt-1">{profileData.location}</p>
-                )}
-            </div>
-
-            {isGroupProfile && profileData.members && (
-                <MembersScroller
-                    members={profileData.members}
-                    selectedMemberId={selectedMember?.id || 0}
-                    onSelectMember={handleMemberSelect}
-                />
-            )}
-
-            {/* Stats */}
-            <div key={detailsKey} className={`mt-4 flex justify-around items-center text-gray-600 border-t border-b border-gray-200 py-3 transition-opacity duration-150 ${isFading ? 'opacity-0' : 'opacity-100'}`}>
-                    <div className="text-center">
-                    <div className="flex items-center justify-center space-x-1">
-                        <StarIcon className="w-4 h-4 text-yellow-500" />
-                        <span className="font-bold text-brand-dark">{displayData.rating.toFixed(1) || 'N/A'}</span>
-                    </div>
-                    <p className="text-xs text-gray-500">Rating</p>
-                </div>
-                    <div className="text-center">
-                        <div className="flex items-center justify-center space-x-1">
-                        <LocationIcon className="w-4 h-4 text-red-500" />
-                        <span className="font-bold text-brand-dark">{displayData.distanceKm}km</span>
-                    </div>
-                    <p className="text-xs text-gray-500">Distance</p>
-                </div>
-                    <div className="text-center">
-                        <div className="flex items-center justify-center space-x-1">
-                        <RateIcon className="w-4 h-4 text-green-500" />
-                         {isEditing && canEdit ? (
-                            <div className="flex items-center gap-1">
-                                <span className="font-bold text-brand-dark">{profileData.currency}</span>
-                                <input 
-                                    type="number"
-                                    value={editedRate}
-                                    onChange={e => setEditedRate(e.target.value)}
-                                    className="w-16 text-center bg-gray-100 border border-gray-300 rounded-md px-1 py-0.5"
-                                />
-                                <span>/</span>
-                                <select 
-                                    value={editedRateType} 
-                                    onChange={e => setEditedRateType(e.target.value as ServiceProvider['rateType'])}
-                                    className="text-xs bg-gray-100 border border-gray-300 rounded-md py-0.5"
-                                >
-                                    {Object.entries(rateSuffix).map(([key, value]) => (
-                                        <option key={key} value={key}>{value}</option>
-                                    ))}
-                                </select>
-                            </div>
+                
+                {/* Profile Info */}
+                <div className={`${(isGroupProfile || profileData.accountType === 'organization') ? 'pt-6' : 'pt-14'} text-center px-4`}>
+                    <div className="flex items-center justify-center space-x-2">
+                        <h1 className="text-2xl font-bold text-brand-navy">{isOwner ? `$KILL ID: ${profileData.name.split(' ')[0].toUpperCase()}-${profileData.id.slice(0,4)}` : profileData.name}</h1>
+                        {profileData.isVerified ? (
+                            <VerifiedIcon 
+                                className="w-6 h-6 text-blue-500" 
+                                onClick={isSuperAdmin ? () => setShowUnverifyModal(true) : undefined}
+                            />
                         ) : (
-                           <span className="font-bold text-brand-dark">{displayData.currency}{displayData.hourlyRate}/{rateSuffix[displayData.rateType]}</span>
+                            isSuperAdmin && !isEditing && <button onClick={handleVerify} className="text-xs bg-yellow-400 text-yellow-900 font-bold px-2 py-1 rounded-md hover:bg-yellow-500">Verify</button>
                         )}
                     </div>
-                    <p className="text-xs text-gray-500">Rate</p>
-                </div>
-            </div>
-
-            {/* CTA Buttons */}
-            {!isEditing && (
-                <div className="px-4 pt-4">
-                    <div className="flex items-center space-x-3">
-                        <button onClick={() => onToggleSaveContact(profileData.id)} className={`p-3 rounded-xl transition flex-shrink-0 active-scale ${isSaved ? 'bg-brand-primary/20 text-brand-primary' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'}`}>
-                            <BookmarkIcon filled={isSaved} />
-                        </button>
-                        {(profileData.cta || []).map((ctaKey) => {
-                            const cta = ctaConfig[ctaKey];
-                            if (!cta) return null;
-                            const isPrimary = cta.primary || (profileData.cta || []).length === 1;
-                            const buttonClass = isPrimary 
-                                ? "bg-brand-primary text-white hover:bg-gray-700" 
-                                : "bg-gray-200 text-gray-800 hover:bg-gray-300";
-                            return (
-                                <button key={ctaKey} onClick={cta.action} className={`flex-1 font-bold py-3 px-4 rounded-xl transition flex items-center justify-center space-x-2 active-scale ${buttonClass}`}>
-                                    {cta.icon} <span>{cta.label}</span>
-                                </button>
-                            );
-                        })}
-                    </div>
-                </div>
-            )}
-             {isEditing && (
-                <div className="px-4 pt-4 flex items-center space-x-3">
-                    <button onClick={handleCancelEdit} className="flex-1 bg-gray-200 text-gray-800 font-bold py-3 px-4 rounded-xl active-scale">Cancel</button>
-                    <button onClick={handleSave} className="flex-1 bg-brand-dark text-white font-bold py-3 px-4 rounded-xl active-scale">Save Changes</button>
-                </div>
-            )}
-            
-            {/* Main Content */}
-            <div className="p-4 space-y-4 pb-4">
-                {/* About Section */}
-                <div>
-                    <h2 className="font-bold text-lg text-brand-dark mb-2">About {isGroupProfile ? profileData.name : ''}</h2>
                     {isEditing ? (
-                        <textarea 
-                            value={editedAbout}
-                            onChange={(e) => setEditedAbout(e.target.value)}
-                            rows={5}
-                            className="w-full text-sm text-gray-700 leading-relaxed bg-gray-100 border border-gray-300 rounded-md p-2"
+                        <input 
+                            type="text" 
+                            value={editedService} 
+                            onChange={(e) => setEditedService(e.target.value)} 
+                            className="text-md text-gray-600 bg-gray-100 border border-gray-300 rounded-md text-center mt-1 px-2 py-1"
                         />
                     ) : (
-                        <p className="text-sm text-gray-700 leading-relaxed">{profileData.about}</p>
+                        <p className="text-md text-gray-600">{profileData.service}</p>
+                    )}
+                    {isEditing ? (
+                        <input 
+                            type="text" 
+                            value={editedLocation} 
+                            onChange={(e) => setEditedLocation(e.target.value)} 
+                            placeholder="e.g. Westlands, Nairobi"
+                            className="text-sm text-gray-500 bg-gray-100 border border-gray-300 rounded-md text-center mt-1 px-2 py-1"
+                        />
+                    ) : (
+                        <p className="text-sm text-gray-500 mt-1">{profileData.location}</p>
                     )}
                 </div>
 
-                {/* Skills Section */}
-                {hasSkills && (
-                    <div>
-                        <h2 className="font-bold text-lg text-brand-dark font-mono tracking-tighter mb-2">$kills</h2>
-                        <div className="flex space-x-3 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4">
-                            {profileData.skills?.map(skill => (
-                                <SkillBadge key={skill.id} skill={skill} onClick={() => setSelectedSkill(skill)} />
+                {isGroupProfile && profileData.members && (
+                    <MembersScroller
+                        members={profileData.members}
+                        selectedMemberId={selectedMember?.id || '0'}
+                        onSelectMember={handleMemberSelect}
+                    />
+                )}
+
+                {/* Stats */}
+                <div key={detailsKey} className={`mt-4 flex justify-around items-center text-gray-600 border-t border-b border-gray-200 py-3 transition-opacity duration-150 ${isFading ? 'opacity-0' : 'opacity-100'}`}>
+                        <div className="text-center">
+                        <div className="flex items-center justify-center space-x-1">
+                            <StarIcon className="w-4 h-4 text-yellow-500" />
+                            <span className="font-bold text-brand-navy">{displayData.rating.toFixed(1) || 'N/A'}</span>
+                        </div>
+                        <p className="text-xs text-gray-500">Rating</p>
+                    </div>
+                        <div className="text-center">
+                            <div className="flex items-center justify-center space-x-1">
+                            <LocationIcon className="w-4 h-4 text-red-500" />
+                            <span className="font-bold text-brand-navy">{displayData.distanceKm}km</span>
+                        </div>
+                        <p className="text-xs text-gray-500">Distance</p>
+                    </div>
+                        <div className="text-center">
+                            <div className="flex items-center justify-center space-x-1">
+                            <RateIcon className="w-4 h-4 text-green-500" />
+                            {isEditing && canEdit ? (
+                                <div className="flex items-center gap-1">
+                                    <span className="font-bold text-brand-navy">{profileData.currency}</span>
+                                    <input 
+                                        type="number"
+                                        value={editedRate}
+                                        onChange={e => setEditedRate(e.target.value)}
+                                        className="w-16 text-center bg-gray-100 border border-gray-300 rounded-md px-1 py-0.5"
+                                    />
+                                    <span>/</span>
+                                    <select 
+                                        value={editedRateType} 
+                                        onChange={e => setEditedRateType(e.target.value as ServiceProvider['rateType'])}
+                                        className="text-xs bg-gray-100 border border-gray-300 rounded-md py-0.5"
+                                    >
+                                        {Object.entries(rateSuffix).map(([key, value]) => (
+                                            <option key={key} value={key}>{value}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            ) : (
+                            <span className="font-bold text-brand-navy">{displayData.currency}{displayData.hourlyRate}/{rateSuffix[displayData.rateType]}</span>
+                            )}
+                        </div>
+                        <p className="text-xs text-gray-500">Rate</p>
+                    </div>
+                </div>
+                {isEditing && (
+                    <div className="px-4 py-4 border-b">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Call to Action Buttons (Select up to 2)</label>
+                        <div className="grid grid-cols-2 gap-2">
+                            {allCtaOptions.map(option => (
+                                 <label key={option.value} className="flex items-center p-2 border rounded-md bg-white">
+                                    <input 
+                                        type="checkbox" 
+                                        value={option.value} 
+                                        checked={editedCtas.includes(option.value)}
+                                        onChange={handleCtaChange}
+                                        disabled={!editedCtas.includes(option.value) && editedCtas.length >= 2}
+                                        className="text-brand-navy focus:ring-brand-gold"
+                                    />
+                                    <span className="ml-2 text-sm text-gray-800">{option.label}</span>
+                                </label>
                             ))}
                         </div>
                     </div>
                 )}
-                
-                {/* Tabbed section for Gallery and QR Code */}
-                <div>
-                    <div className="border-b border-gray-200">
-                        <nav className="-mb-px flex space-x-6" aria-label="Tabs">
-                            {hasWorks && (
-                                <button
-                                    onClick={() => setActiveTab('works')}
-                                    className={`${activeTab === 'works' ? 'border-brand-primary text-brand-primary' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'} whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm`}
-                                >
-                                    Gallery
-                                </button>
-                            )}
-                             {hasCatalogue && (
-                                <button
-                                    onClick={() => setActiveTab('catalogue')}
-                                    className={`${activeTab === 'catalogue' ? 'border-brand-primary text-brand-primary' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'} whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm`}
-                                >
-                                    Catalogue
-                                </button>
-                            )}
-                            <button
-                                onClick={() => setActiveTab('qr')}
-                                className={`${activeTab === 'qr' ? 'border-brand-primary text-brand-primary' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'} whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm`}
-                            >
-                                QR Code
+                {/* CTA Buttons */}
+                {!isEditing && (
+                    <div className="px-4 pt-4">
+                        <div className="flex items-center space-x-3">
+                            <button onClick={() => onToggleSaveContact(profileData.id)} className={`p-3 rounded-xl transition flex-shrink-0 active-scale ${isSaved ? 'bg-brand-gold/20 text-brand-gold' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'}`}>
+                                <BookmarkIcon filled={isSaved} />
                             </button>
-                        </nav>
+                            {(profileData.cta || []).map((ctaKey) => {
+                                const cta = ctaConfig[ctaKey];
+                                if (!cta) return null;
+                                const isPrimary = cta.primary || (profileData.cta || []).length === 1;
+                                const buttonClass = isPrimary 
+                                    ? "bg-brand-gold text-brand-navy hover:opacity-90" 
+                                    : "bg-gray-200 text-gray-800 hover:bg-gray-300";
+                                return (
+                                    <button key={ctaKey} onClick={cta.action} className={`flex-1 font-bold py-3 px-4 rounded-xl transition flex items-center justify-center space-x-2 active-scale ${buttonClass}`}>
+                                        {cta.icon} <span>{cta.label}</span>
+                                    </button>
+                                );
+                            })}
+                        </div>
                     </div>
-                    <div key={activeTab} className="mt-4 animate-fade-in">
-                        {activeTab === 'works' && hasWorks && (
-                             <div className="grid grid-cols-3 gap-2">
-                                {profileData.works.map((workUrl, index) => (
-                                    <div key={index} className="aspect-square bg-gray-200 rounded-lg overflow-hidden">
-                                        <img src={workUrl} alt={`Work sample ${index + 1}`} className="w-full h-full object-cover" />
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                        {activeTab === 'catalogue' && hasCatalogue && (
-                             <div className="grid grid-cols-2 gap-3">
-                                {catalogueItems.map((item) => (
-                                    <CatalogueItemCard key={item.id} item={item} onClick={() => setSelectedCatalogueItem(item)} />
-                                ))}
-                            </div>
-                        )}
-                        {activeTab === 'qr' && (
-                            <div className="bg-white p-4 rounded-lg flex flex-col items-center justify-center">
-                               <img 
-                                   src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(profileUrl)}`} 
-                                   alt="Contact QR Code"
-                                   className="w-36 h-36"
-                               />
-                               <p className="text-sm text-gray-600 mt-3 text-center">Scan this code to quickly view {profileData.name}'s profile.</p>
-                            </div>
-                        )}
+                )}
+                {isEditing && (
+                    <div className="px-4 pt-4 flex items-center space-x-3">
+                        <button onClick={handleCancelEdit} className="flex-1 bg-gray-200 text-gray-800 font-bold py-3 px-4 rounded-xl active-scale">Cancel</button>
+                        <button onClick={handleSave} className="flex-1 bg-brand-navy text-white font-bold py-3 px-4 rounded-xl active-scale">Save Changes</button>
+                    </div>
+                )}
+            </div>
+            
+            <div className="flex-1 overflow-y-auto no-scrollbar">
+                <div className="p-4 space-y-4">
+                    {/* About/Skills Section */}
+                    <div>
+                        <div className="border-b border-gray-200">
+                            <nav className="-mb-px flex space-x-6" aria-label="Tabs">
+                                <button
+                                    onClick={() => setMainContentTab('about')}
+                                    className={`${mainContentTab === 'about' ? 'border-brand-gold text-brand-navy' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'} whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm`}
+                                >
+                                    About {isGroupProfile ? profileData.name : ''}
+                                </button>
+                                {hasSkills && (
+                                     <button
+                                        onClick={() => setMainContentTab('skills')}
+                                        className={`${mainContentTab === 'skills' ? 'border-brand-gold text-brand-navy' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'} whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm`}
+                                    >
+                                        $kills
+                                    </button>
+                                )}
+                            </nav>
+                        </div>
+                        <div className="mt-4 animate-fade-in">
+                             {mainContentTab === 'about' && (
+                                isEditing ? (
+                                    <textarea 
+                                        value={editedAbout}
+                                        onChange={(e) => setEditedAbout(e.target.value)}
+                                        rows={5}
+                                        className="w-full text-sm text-gray-700 leading-relaxed bg-gray-100 border border-gray-300 rounded-md p-2"
+                                    />
+                                ) : (
+                                    <p className="text-sm text-gray-700 leading-relaxed">{profileData.about}</p>
+                                )
+                            )}
+                            {mainContentTab === 'skills' && hasSkills && (
+                                <div className="space-y-3">
+                                    {profileData.skills?.map(skill => (
+                                        <SkillCard key={skill.id} skill={skill} onClick={() => setSelectedSkill(skill)} />
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                    
+                    {/* Tabbed section for Gallery and QR Code */}
+                    <div>
+                        <div className="border-b border-gray-200 mt-4">
+                            <nav className="-mb-px flex space-x-6" aria-label="Tabs">
+                                {hasWorks && (
+                                    <button
+                                        onClick={() => setGalleryTab('works')}
+                                        className={`${galleryTab === 'works' ? 'border-brand-gold text-brand-navy' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'} whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm`}
+                                    >
+                                        Gallery
+                                    </button>
+                                )}
+                                {hasCatalogue && (
+                                    <button
+                                        onClick={() => setGalleryTab('catalogue')}
+                                        className={`${galleryTab === 'catalogue' ? 'border-brand-gold text-brand-navy' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'} whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm`}
+                                    >
+                                        Catalogue
+                                    </button>
+                                )}
+                                <button
+                                    onClick={() => setGalleryTab('qr')}
+                                    className={`${galleryTab === 'qr' ? 'border-brand-gold text-brand-navy' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'} whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm`}
+                                >
+                                    QR Code
+                                </button>
+                            </nav>
+                        </div>
+                        <div key={galleryTab} className="mt-4 animate-fade-in">
+                            {galleryTab === 'works' && hasWorks && (
+                                <div className="grid grid-cols-3 gap-2">
+                                    {profileData.works.map((workUrl, index) => (
+                                        <div key={index} className="aspect-square bg-gray-200 rounded-lg overflow-hidden">
+                                            <img src={workUrl} alt={`Work sample ${index + 1}`} className="w-full h-full object-cover" />
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                            {galleryTab === 'catalogue' && hasCatalogue && (
+                                <div className="grid grid-cols-2 gap-3">
+                                    {catalogueItems.map((item) => (
+                                        <CatalogueItemCard key={item.id} item={item} onClick={() => setSelectedCatalogueItem(item)} />
+                                    ))}
+                                </div>
+                            )}
+                            {galleryTab === 'qr' && (
+                                <div className="bg-white p-4 rounded-lg flex flex-col items-center justify-center">
+                                <img 
+                                    src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(profileUrl)}`} 
+                                    alt="Contact QR Code"
+                                    className="w-36 h-36"
+                                />
+                                <p className="text-sm text-gray-600 mt-3 text-center">Scan this code to quickly view {profileData.name}'s profile.</p>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>

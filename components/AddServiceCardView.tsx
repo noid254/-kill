@@ -220,7 +220,7 @@ const SignUpView: React.FC<SignUpViewProps> = ({ onBack, onSave, categories, cur
                                             checked={ctas.includes(option.value)}
                                             onChange={handleCtaChange}
                                             disabled={!ctas.includes(option.value) && ctas.length >= 2}
-                                            className="text-brand-primary focus:ring-brand-primary"
+                                            className="text-brand-navy focus:ring-brand-gold"
                                         />
                                         <span className="ml-2 text-sm">{option.label}</span>
                                     </label>
@@ -234,7 +234,7 @@ const SignUpView: React.FC<SignUpViewProps> = ({ onBack, onSave, categories, cur
             </main>
 
             <footer className="fixed bottom-0 left-0 right-0 max-w-sm mx-auto p-4 bg-gray-50 border-t border-gray-200">
-                 <button onClick={handleSubmit} className="w-full bg-brand-dark text-white font-bold py-4 px-4 rounded-2xl hover:bg-gray-700 transition-colors shadow-lg">
+                 <button onClick={handleSubmit} className="w-full bg-brand-navy text-white font-bold py-4 px-4 rounded-2xl hover:opacity-90 transition-colors shadow-lg">
                     Create Profile
                 </button>
             </footer>

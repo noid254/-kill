@@ -150,8 +150,8 @@ const NikoSoko: React.FC<NikoSokoProps> = ({ providers, onSelectProvider, search
             )}
 
             <div className="relative w-full h-80 shadow-lg">
-                <img src={bannerUrl} key={bannerUrl} alt={title} className="absolute inset-0 w-full h-full object-cover rounded-b-3xl animate-fade-in" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-black/10 rounded-b-3xl"></div>
+                <img src={bannerUrl} key={bannerUrl} alt={title} className="absolute inset-0 w-full h-full object-cover animate-fade-in" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-black/10"></div>
                 
                 <header className="absolute top-0 left-0 right-0 pt-4 px-4 flex justify-between items-center text-white z-10">
                     <button onClick={onBack} className="p-2 -ml-2"><BackIcon /></button>
@@ -163,33 +163,31 @@ const NikoSoko: React.FC<NikoSokoProps> = ({ providers, onSelectProvider, search
                 </header>
 
                 <div className="relative h-full flex flex-col items-center justify-center text-center text-white p-4">
-                    <h1 className="text-5xl font-bold font-serif">{title}</h1>
-                    <p className="mt-2 max-w-sm text-lg opacity-90">{subtitle}</p>
+                    <h1 className="text-4xl font-bold font-serif">{title}</h1>
+                    <p className="mt-2 max-w-sm text-base opacity-90">{subtitle}</p>
                 </div>
             </div>
             
-            <div className="p-4 -mt-16 relative z-10">
+            <div className="p-4 relative z-10">
                 <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-2">
                     {parentCategories.map(parent => (
-                        <button 
-                            key={parent}
-                            onClick={() => handleParentClick(parent)}
-                            className={`flex-shrink-0 px-5 py-2.5 text-sm font-bold rounded-full transition-all duration-200 shadow-md ${activeParent === parent ? 'bg-slate-900 text-white' : 'bg-white text-slate-800'}`}
-                        >
-                            {parent.replace('_', ' & ')}
-                        </button>
-                    ))}
-                </div>
-
-                <div className="mt-3 flex items-center gap-2 overflow-x-auto no-scrollbar pb-2">
-                    {serviceFilters[activeParent].children.map(child => (
-                        <button
-                            key={child}
-                            onClick={() => setActiveChild(child)}
-                            className={`flex-shrink-0 px-4 py-1.5 text-xs font-semibold rounded-full capitalize transition-colors ${activeChild === child ? 'bg-slate-400 text-white' : 'bg-slate-200 text-slate-600'}`}
-                        >
-                            {child}
-                        </button>
+                        <React.Fragment key={parent}>
+                            <button 
+                                onClick={() => handleParentClick(parent)}
+                                className={`flex-shrink-0 px-5 py-2.5 text-sm font-bold rounded-full transition-all duration-200 shadow-md ${activeParent === parent ? 'bg-slate-900 text-white' : 'bg-white text-slate-800'}`}
+                            >
+                                {parent.replace('_', ' & ')}
+                            </button>
+                            {activeParent === parent && serviceFilters[parent].children.map(child => (
+                                <button
+                                    key={child}
+                                    onClick={() => setActiveChild(child)}
+                                    className={`flex-shrink-0 px-4 py-1.5 text-xs font-semibold rounded-full capitalize transition-colors ${activeChild === child ? 'bg-slate-400 text-white' : 'bg-slate-200 text-slate-600'}`}
+                                >
+                                    {child}
+                                </button>
+                            ))}
+                        </React.Fragment>
                     ))}
                 </div>
             </div>

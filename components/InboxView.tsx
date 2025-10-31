@@ -146,7 +146,8 @@ const InboxMessageRow: React.FC<{
 }
 
 const InboxView: React.FC<InboxViewProps> = ({ messages, onUpdateMessages, currentUserPhone, allProviders, onAction, onViewProviderProfile }) => {
-    const [selectedMessageId, setSelectedMessageId] = useState<number | null>(null);
+    // FIX: Changed selectedMessageId state to handle string IDs instead of numbers.
+    const [selectedMessageId, setSelectedMessageId] = useState<string | null>(null);
 
     const userMessages = useMemo(() => {
         const normalizedPhone = currentUserPhone?.slice(-9);
@@ -155,7 +156,8 @@ const InboxView: React.FC<InboxViewProps> = ({ messages, onUpdateMessages, curre
             .sort((a,b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
     }, [messages, currentUserPhone]);
     
-    const handleSelectMessage = (id: number) => {
+    // FIX: Updated handleSelectMessage to accept a string ID, matching the message ID type.
+    const handleSelectMessage = (id: string) => {
         setSelectedMessageId(prev => prev === id ? null : id);
         onUpdateMessages(messages.map(msg => msg.id === id ? {...msg, isRead: true} : msg));
     };
